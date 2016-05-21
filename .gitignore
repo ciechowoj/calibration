@@ -120,3 +120,5 @@ ENV/
 # Sublime text
 *.sublime-workspace
 myplot.png
+scene.png
+view.png
