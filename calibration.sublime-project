@@ -8,7 +8,7 @@
             "cmd": ["python3", "main.py"],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "selector": "source.python",
-
+            "ignore_errors": "(?:.*backend_gtk3.py.*|.*\\(main.py:....\\): WARNING.*Failed to connect.*|.*GLib.source_remove\\(self\\._idle_draw_id\\).*)",
             "variants":
             [
                 {

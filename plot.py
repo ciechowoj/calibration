@@ -32,7 +32,7 @@ def plot_camera(axes3d, camera):
             length = norm(d),
             **kwargs)
 
-    K, R, T = decompose(camera)
+    K, R, T = decompose(camera[0])
 
     quiver(axes3d, T, R[0] * 2, colors=[(1, 0, 0, 1)])
     quiver(axes3d, T, R[1] * 2, colors=[(0, 1, 0, 1)])
@@ -46,7 +46,7 @@ def plot_scene(points, cameras, path = "scene.png"):
     pyplot.savefig(path)
 
 def plot_view(points, camera, width, height, path = "view.png"):
-    points2D = project(points, camera)
+    points2D = project(points, camera[0])
 
     pyplot.figure()
     pyplot.plot(points2D[0], points2D[1], 'o')

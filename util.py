@@ -65,6 +65,6 @@ def make_camera(eye, center, up, fovy, width, height):
         [0, alpha_y, 0],
         [0, 0, -1]])
 
-    return dot(K, M)
+    return (dot(K, M), (width, height))
 
 
