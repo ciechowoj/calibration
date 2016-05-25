@@ -24,7 +24,10 @@ def decompose(P):
     if det(R) < 0:
         R *= -1
 
-    return K, R, -linalg.inv(dot(K, R)).dot(T.reshape((3, 1)))
+    K /= -K[2,2]
+    T *= -K[2,2]
+
+    return K, R, linalg.inv(dot(K, -R)).dot(T.reshape((3, 1)))
 
 def project(points, camera):
     points2D = dot(camera, points)
@@ -57,7 +60,7 @@ def make_camera(eye, center, up, fovy, width, height):
 
     f = tan(fovy * 0.5) ** -1
 
-    alpha_x = f * width *  0.5
+    alpha_x = f * height *  0.5
     alpha_y = f * height * 0.5
 
     K = array([
@@ -67,4 +70,10 @@ def make_camera(eye, center, up, fovy, width, height):
 
     return (dot(K, M), (width, height))
 
+def rank3decomp(Q):
+    U, S, V = svd(Q)
 
+    S[3] = 0.0
+    S = diag(sqrt(S))
+
+    return dot(U, S)[:,:3], dot(S, V)[:3,:]

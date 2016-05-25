@@ -5,8 +5,19 @@ from util import *
 def sample_cube(num, center = array([0, 0, 0]), size = 1):
     result = (random.rand(3, num).T - array([0.5] * 3)) * size + center
     result = hstack((result, ones((num, 1))))
-
     return result.T
+
+def sample_sphere(num, center = [0, 0, 0], radius = 1):
+    result = []
+    center = array(center)
+
+    while len(result) < num:
+        sample = (random.rand(3) - 0.5) * 2.0 * radius
+
+        if norm(sample) < radius:
+            result.append(sample)
+
+    return hstack((result, ones((num, 1)))).T
 
 def make_cube(num, center = array([0, 0, 0]), size = 5):
     num = num // 6
@@ -126,7 +137,7 @@ def make_test_points():
 
 def camera_test_set1():
     return [
-        make_camera([0, 1, -16], [0, 0, 0], [0, 1, 0], pi / 2 * 1.2, 800, 600),
+        make_camera([0, 1, -16], [0, 0, 0], [0, 1, 0], pi / 2 * 1.2, 2000, 600),
         make_camera([1, 3, -11], [0, 0, 0], [0, 1, 0], pi / 2 * 1.1, 640, 480),
         make_camera([2, 5, -7], [0, 0, 0], [0, 1, 0], pi / 2 * 1.0, 1000, 1000),
         make_camera([9, 2, -3], [0, 0, 0], [0, 1, 0], pi / 2 * 0.9, 1280, 720),
@@ -137,4 +148,10 @@ def camera_test_set1():
         make_camera([-8, 2.5, -9], [0, 0, 0], [0, 1, 0], pi / 2 * 1.0, 1280, 720),
         make_camera([-7, 3.5, 11], [0, 0, 0], [0, 1, 0], pi / 2 * 1.4, 1920, 1080),
         make_camera([-1, 0, 15], [0, 0, 0], [0, 1, 0], pi / 2 * 1.0, 1280, 720)]
+
+def print_matrix(M):
+    n, m = M.shape
+
+    for i in range(n):
+        print(' '.join(['{:8.2g}'.format(M[i, j]) for j in range(m)]))
 
