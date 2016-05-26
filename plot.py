@@ -19,9 +19,9 @@ def make_axes3d():
 def plot_points(axes3d, points):
     for i in range(points.shape[1]):
         axes3d.scatter(
-            points[0, i],
-            points[2, i],
-            points[1, i])
+            points[0, i] / points[3, i],
+            points[2, i] / points[3, i],
+            points[1, i] / points[3, i])
 
 def plot_camera(axes3d, camera):
     def quiver(axes3d, p, d, **kwargs):
@@ -62,7 +62,10 @@ def plot_view(points, camera, path = "view.png"):
     points2D = project(points, camera[0])
 
     pyplot.figure()
-    pyplot.plot(points2D[0], points2D[1], 'o')
+    pyplot.plot(
+        points2D[0] / points2D[2],
+        points2D[1] / points2D[2],
+        'o')
 
     width, height = camera[1]
     w = width / 2
