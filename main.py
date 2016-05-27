@@ -7,7 +7,7 @@ from test import *
 
 X = make_test_points2()
 
-cameras = camera_test_set1()[:10]
+cameras = camera_test_set1()[0:10]
 resolutions = [camera[1] for camera in cameras]
 
 def camera_matrix(cameras):
@@ -22,22 +22,39 @@ P = camera_matrix(cameras)
 W = dot(P, X)
 
 #print_matrix(W)
+W = remove_projective_depths(W)
 
+F = fundamental_matrix(W[0:3], W[3:6])
 
-def remove_projective_depths(W):
-    # for i in range(W.shape[0] // 3):
-    #     W[i * 3 + 0] /= W[i * 3 + 2, 0]
-    #     W[i * 3 + 1] /= W[i * 3 + 2, 0]
-    #     W[i * 3 + 2] /= W[i * 3 + 2, 0]
+def right_epipole(F):
+    U, S, V = svd(F)
+    return V[-1,:]
 
-    for i in range(W.shape[1]):
-        W[:,i] /= W[2,i]
+e = right_epipole(F)
+
+def recover_projective_depths(W):
+
+    for i in range(1, W.shape[0] // 3):
+        j = 0
+        F = fundamental_matrix(W[i * 3:i * 3 + 3], W[j * 3:j * 3 + 3])
+        e = right_epipole(F.T)
+
+        for k in range(W.shape[1]):
+            qi = W[i * 3:i * 3 + 3, k]
+            qj = W[j * 3:j * 3 + 3, k]
+
+            eq = cross(e, qi)
+
+            W[i * 3 + 2, k] = (dot(eq, dot(F, qj)) / (norm(eq) ** 2)) * W[j * 3 + 2, k]
+
+        W[i * 3: i * 3 + 2] *= W[i * 3 + 2]
 
     return W
 
 
+W = recover_projective_depths(W)
+#print_matrix(W)
 
-W = remove_projective_depths(W)
 
 hP, hX = factor_measurement_matrix(W)
 
@@ -50,5 +67,7 @@ hP, hX = resolve_camera_ambiguity(W, hP, hX)
 hCameras = separate_cameras(hP, resolutions)
 
 plot_scene(hX, hCameras)
-id = 3
-plot_view(hX, hCameras[id])
+plot_scene(X, cameras, "scene2.png")
+id = 9
+#plot_view(hX, hCameras[id])
+#plot_view(X, cameras[id], "view2.png")
