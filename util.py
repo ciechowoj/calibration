@@ -203,20 +203,15 @@ def find_frame_of_reference(target, source):
     return dot(linalg.pinv(source.T), target.T).T
 
 def resolve_camera_ambiguity(W, P, X):
-    sign = 0
     X /= X[3,:]
 
     for i in range(W.shape[0] // 3):
-        if not isnan(W[i * 3 + 0, 0]):
-            p = dot(P[i * 3 + 0:i * 3 + 3,:], X[:,0])
-            if p[2] < 0:
-                sign -= 1
-            else:
-                sign += 1
+        sign = 0
+        Z = dot(P[i * 3 + 2], X[:, logical_not(isnan(X[2,:]))])
+        sign = Z.shape[0] // 2 - (Z < 0).sum()
+        P[i * 3:i * 3 + 3] *= (sign / abs(sign))
 
-    sign /= abs(sign)
-
-    return P * sign, X
+    return P, X
 
 def remove_projective_depths(W):
     for i in range(W.shape[0] // 3):

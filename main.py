@@ -5,7 +5,7 @@ import scipy.linalg
 from plot import *
 from test import *
 
-X = make_test_points2()
+X = make_test_points2()[:,:12]
 
 cameras = camera_test_set1()[0:10]
 resolutions = [camera[1] for camera in cameras]
@@ -33,27 +33,30 @@ def right_epipole(F):
 e = right_epipole(F)
 
 def recover_projective_depths(W):
+    j = 9
 
-    for i in range(1, W.shape[0] // 3):
-        j = 0
-        F = fundamental_matrix(W[i * 3:i * 3 + 3], W[j * 3:j * 3 + 3])
-        e = right_epipole(F.T)
+    for i in range(0, W.shape[0] // 3):
+        if i != j:
+            F = fundamental_matrix(W[i * 3:i * 3 + 3], W[j * 3:j * 3 + 3])
+            e = right_epipole(F.T)
 
-        for k in range(W.shape[1]):
-            qi = W[i * 3:i * 3 + 3, k]
-            qj = W[j * 3:j * 3 + 3, k]
+            for k in range(W.shape[1]):
+                qi = W[i * 3:i * 3 + 3, k]
+                qj = W[j * 3:j * 3 + 3, k]
 
-            eq = cross(e, qi)
+                eq = cross(e, qi)
 
-            W[i * 3 + 2, k] = (dot(eq, dot(F, qj)) / (norm(eq) ** 2)) * W[j * 3 + 2, k]
+                W[i * 3 + 2, k] = (dot(eq, dot(F, qj)) / (norm(eq) ** 2)) * W[j * 3 + 2, k]
 
-        W[i * 3: i * 3 + 2] *= W[i * 3 + 2]
+            w = 1.0 / sqrt(mean(abs(W[i * 3 + 2] - mean(W[i * 3 + 2])) ** 2))
+            W[i * 3: i * 3 + 2] *= W[i * 3 + 2]
+            W[i * 3: i * 3 + 3] *= w
 
     return W
 
 
 W = recover_projective_depths(W)
-#print_matrix(W)
+print_matrix(W)
 
 
 hP, hX = factor_measurement_matrix(W)
