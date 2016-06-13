@@ -232,6 +232,10 @@ def normalization_matrix(W):
         [0, dev[1], -avg[1] * dev[1]],
         [0, 0, 1]])
 
+def right_epipole(F):
+    U, S, V = svd(F)
+    return V[-1,:]
+
 # W0 F W1 = 0
 def fundamental_matrix(W0, W1):
     T0 = normalization_matrix(W0)
@@ -266,3 +270,40 @@ def fundamental_matrix(W0, W1):
     F = dot(dot(U, diag(S)), V)
 
     return dot(T0.T, dot(F, T1))
+
+def recover_projective_depths(W):
+    j = 0
+
+    for i in range(0, W.shape[0] // 3):
+        if i != j:
+            F = fundamental_matrix(W[i * 3:i * 3 + 3], W[j * 3:j * 3 + 3])
+            e = right_epipole(F.T)
+
+            for k in range(W.shape[1]):
+                qi = W[i * 3:i * 3 + 3, k]
+                qj = W[j * 3:j * 3 + 3, k]
+
+                eq = cross(e, qi)
+
+                W[i * 3 + 2, k] = (dot(eq, dot(F, qj)) / (norm(eq) ** 2)) * W[j * 3 + 2, k]
+
+            w = 1.0 / sqrt(mean(abs(W[i * 3 + 2] - mean(W[i * 3 + 2])) ** 2))
+            W[i * 3: i * 3 + 2] *= W[i * 3 + 2]
+            W[i * 3: i * 3 + 3] *= w
+
+    return W
+
+def balance_measurement_matrix(W):
+    for k in range(2):
+        S = sqrt(1.0 / sum(W * W, axis = 0))
+
+        W *= S
+
+        S = empty(W.shape[0] // 3)
+
+        for j in range(S.shape[0]):
+            S[j] = sqrt(1.0 / sum(W[j * 3: (j + 1) * 3] ** 2))
+
+        for j in range(S.shape[0]):
+            W[j * 3: (j + 1) * 3] *= S[j]
+
