@@ -217,7 +217,7 @@ def remove_projective_depths(W):
     for i in range(W.shape[0] // 3):
         W[i * 3 + 0] /= W[i * 3 + 2]
         W[i * 3 + 1] /= W[i * 3 + 2]
-        W[i * 3 + 2] /= W[i * 3 + 2]
+        W[i * 3 + 2] = NaN
 
     return W
 
@@ -240,6 +240,12 @@ def right_epipole(F):
 def fundamental_matrix(W0, W1):
     T0 = normalization_matrix(W0)
     T1 = normalization_matrix(W1)
+
+    W0 = W0.copy()
+    W1 = W1.copy()
+
+    W0[2,:] = 1
+    W1[2,:] = 1
 
     W0 = dot(T0, W0)
     W1 = dot(T1, W1)
@@ -271,8 +277,41 @@ def fundamental_matrix(W0, W1):
 
     return dot(T0.T, dot(F, T1))
 
-def recover_projective_depths(W):
+def print_matrix(M):
+    n, m = M.shape
+
+    print("-" * 80)
+    for i in range(n):
+        print('|' + ' '.join(['{:8.2g} |'.format(M[i, j]) for j in range(m)]))
+    print("-" * 80)
+
+def recover_projective_depths(A, B):
+    B = B.copy()
+    F = fundamental_matrix(B, A)
+    e = right_epipole(F.T)
+    B[2] = ones(B.shape[1])
+
+    for k in range(A.shape[1]):
+        qi = B[:, k]
+        qj = A[:, k]
+
+        eq = cross(e, qi)
+
+        B[2, k] = (dot(eq, dot(F, qj)) / (norm(eq) ** 2)) * A[2, k]
+
+    w = 1.0 / sqrt(mean(abs(B[2] - mean(B[2])) ** 2))
+    B[:2] *= B[2]
+    B[:] *= w
+
+    return B
+
+def recover_all_projective_depths(W):
+    W = W.copy()
+
     j = 0
+
+    for i in range(0, W.shape[0] // 3):
+        W[i * 3 + 2] = 1
 
     for i in range(0, W.shape[0] // 3):
         if i != j:
@@ -291,9 +330,11 @@ def recover_projective_depths(W):
             W[i * 3: i * 3 + 2] *= W[i * 3 + 2]
             W[i * 3: i * 3 + 3] *= w
 
-    return W
+    return balance_measurement_matrix(W)
 
 def balance_measurement_matrix(W):
+    W = W.copy()
+
     for k in range(2):
         S = sqrt(1.0 / sum(W * W, axis = 0))
 
@@ -307,3 +348,4 @@ def balance_measurement_matrix(W):
         for j in range(S.shape[0]):
             W[j * 3: (j + 1) * 3] *= S[j]
 
+    return W
