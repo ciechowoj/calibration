@@ -662,9 +662,6 @@ def make_remove_locations(W, percent):
     remove = int(m * n * percent)
     removed = 0
 
-    print(remove, removed)
-    sys.stdout.flush()
-
     while removed < remove:
         i = random.randint(0, m - 1)
         j = random.randint(0, n - 1)
@@ -682,17 +679,21 @@ def make_remove_locations(W, percent):
 
     return list(result)
 
+
 def remove_point_locations(W, locations):
-    m, n = W.shape
-    result = W.copy()
+    if not isinstance(locations, list):
+        return remove_point_locations(W, make_remove_locations(W, locations))
+    else:
+        m, n = W.shape
+        result = W.copy()
 
-    for i, j in locations:
-        if i < m and j < n:
-            result[i * 3 + 0, j] = NaN
-            result[i * 3 + 1, j] = NaN
-            result[i * 3 + 2, j] = NaN
+        for i, j in locations:
+            if i < m and j < n:
+                result[i * 3 + 0, j] = NaN
+                result[i * 3 + 1, j] = NaN
+                result[i * 3 + 2, j] = NaN
 
-    return result
+        return result
 
 def remove_point_locations0(W):
     L = [(9, 173), (0, 86), (2, 326), (3, 271),

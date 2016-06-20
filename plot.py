@@ -4,16 +4,16 @@ from util import *
 
 DEFAULT_PATH = "myplot.png"
 
-def make_axes3d():
+def make_axes3d(size):
     figure = pyplot.figure(figsize=(10, 6.5))
     axes3d = figure.add_subplot(111, projection="3d")
     axes3d.autoscale(False)
     axes3d.set_xlabel('X')
     axes3d.set_ylabel('Z')
     axes3d.set_zlabel('Y')
-    axes3d.set_xlim3d(-12, 12)
-    axes3d.set_ylim3d(12, -12)
-    axes3d.set_zlim3d(0, 20)
+    axes3d.set_xlim3d(-size - 2, size + 2)
+    axes3d.set_ylim3d(size + 2, -size - 2)
+    axes3d.set_zlim3d(0, 2 * size)
     return axes3d
 
 def plot_points(axes3d, points):
@@ -42,8 +42,10 @@ def plot_camera(axes3d, camera):
     quiver(axes3d, T, R[1] * 2, colors=[(0, 1, 0, 1)])
     quiver(axes3d, T, R[2] * 2, colors=[(0, 0, 1, 1)])
 
-def plot_scene(points, cameras, path = "scene.png"):
-    axes3d = make_axes3d()
+    return K, R, T
+
+def plot_scene(points, cameras, size = 10, path = "scene.png"):
+    axes3d = make_axes3d(size)
     plot_points(axes3d, points)
 
     if isinstance(cameras, ndarray):
@@ -53,8 +55,9 @@ def plot_scene(points, cameras, path = "scene.png"):
             camera = (cameras[i * 3 + 0: i * 3 + 3, :], (100, 100))
             plot_camera(axes3d, camera)
     else:
-        for camera in cameras:
-            plot_camera(axes3d, camera)
+        for i, camera in enumerate(cameras):
+            K, R, T = plot_camera(axes3d, camera)
+            print("Camera #", i, ": ", T.ravel(), flush = True)
 
     pyplot.savefig(path)
 
