@@ -215,6 +215,7 @@ def find_frame_of_reference(target, source):
     return dot(linalg.pinv(source.T), target.T).T
 
 def resolve_camera_ambiguity(W, P, X):
+    X = X.copy()
     X /= X[3,:]
 
     for i in range(W.shape[0] // 3):
@@ -229,7 +230,7 @@ def remove_projective_depths(W):
     for i in range(W.shape[0] // 3):
         W[i * 3 + 0] /= W[i * 3 + 2]
         W[i * 3 + 1] /= W[i * 3 + 2]
-        W[i * 3 + 2] = NaN
+        W[i * 3 + 2] = 1.0
 
     return W
 
@@ -407,7 +408,7 @@ def rank_four_column_space(W):
 
         num += 1
 
-        if num == W.shape[1] * 4:
+        if num == W.shape[1] * 2:
             break
 
     N = hstack(N)
@@ -513,3 +514,46 @@ def balance_measurement_matrix(W):
 
 def isntnan(x):
     return logical_not(isnan(x))
+
+def load_measurements(path):
+    file = open(path)
+    lines = [line for line in file.readlines() if len(line) > 10 and not line.startswith('#')]
+
+    num_points = len(lines)
+    num_cameras = (len(lines[0].split(";")) - 2) // 2
+
+    W = empty((num_cameras * 3, num_points))
+
+    for i, line in enumerate(lines):
+        fields = list(map(lambda x: float(x.strip()), line.split(";")))[2:]
+
+        for j in range(num_cameras):
+            x, y = fields[j * 2 + 0], fields[j * 2 + 1]
+
+            if isnan(x) or isnan(y):
+                W[j * 3 + 0, i] = NaN
+                W[j * 3 + 1, i] = NaN
+                W[j * 3 + 2, i] = NaN
+            else:
+                W[j * 3 + 0, i] = x
+                W[j * 3 + 1, i] = y
+                W[j * 3 + 2, i] = 1.0
+
+    return W
+
+def load_truth(path, scale = 1.0):
+    file = open(path)
+    lines = [line for line in file.readlines() if len(line) > 10 and not line.startswith('#')]
+
+    num_points = len(lines)
+
+    X = ones((4, num_points))
+
+    for i, line in enumerate(lines):
+        fields = list(map(lambda x: float(x.strip()), line.split(";")))
+
+        X[0, i] = fields[0] * scale
+        X[1, i] = fields[1] * scale
+        X[2, i] = fields[2] * scale
+
+    return X
