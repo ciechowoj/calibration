@@ -1,0 +1,145 @@
+
+\newcommand{\ds}[0]{\displaystyle}
+\newcommand{\ml}[0]{\mathlarger}
+
+\newcommand{\smatheq}[1] {
+    \scalebox{0.75}{
+        \begin{minipage}{1.2\linewidth}
+            \begin{align*}
+                #1
+            \end{align*}
+        \end{minipage}
+    }
+}
+
+\newcommand{\matheq}[1] {
+$$
+\begin{aligned}
+#1
+\end{aligned}
+$$
+}
+
+\newcommand{\nmatheq}[1] {
+\begin{equation}
+\begin{aligned}
+#1
+\end{aligned}
+\end{equation}
+}
+
+\newcommand{\lmatheq}[1] {
+    \scalebox{1.3}{
+        \begin{minipage}{0.744\linewidth}
+            \begin{align*}
+                #1
+            \end{align*}
+        \end{minipage}
+    }
+}
+
+\newcommand{\bmatheq}[1] {
+    \scalebox{1.0}{
+        \begin{minipage}{0.98\linewidth}
+            \begin{align*}
+                #1
+            \end{align*}
+        \end{minipage}
+    }
+}
+
+\newcommand{\hmatheq}[1] {
+\[ \scalebox{2}{$#1$} \]
+}
+
+\newcommand{\code}[1]{\texttt {\noindent\ignorespaces #1}}
+
+\newcommand{\blist}[1] {
+\begin{itemize}
+#1
+\end{itemize}
+}
+
+\newcommand{\rarrow}{\rightarrow}
+\newcommand{\larrow}{\leftarrow}
+\newcommand{\lrarrow}{\leftrightarrow}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\newcommand{\xa}[1] {\left< #1 \right> }
+\newcommand{\xb}[1] {\left{ #1 \right} }
+\newcommand{\xp}[1] {\left( #1 \right)}
+\newcommand{\xs}[1] {\left[ #1 \right]}
+
+
+\newcommand{\E}[1] {E \left[ #1 \right]}
+\newcommand{\xE}[1] {E \left[ #1 \right]}
+\newcommand{\xsum}[2] {\sum\limits_{#1}^{#2}}
+\newcommand{\xint}[2] {\int_{#1}^{#2}}
+\newcommand{\xd}[1] {\, d#1}
+
+\newcommand{\omegai}[0] {\omega_i}
+\newcommand{\omegao}[0] {\omega_o}
+
+\newcommand{\red}[1] {\begingroup\color{red}#1\endgroup}
+
+\makeatletter
+    \newenvironment{withoutheadline}{
+        \def\beamer@entrycode{\vspace*{-\headheight}}
+    }{}
+\makeatother
+
+
+\newcommand{\imageframe}[2]{
+    \begin{withoutheadline}
+    \begin{frame}
+        \centerline{\includegraphics[width=#2\textwidth]{#1}}
+        \begin{flushright}
+        [Qin 2015]
+        \end{flushright}
+    \end{frame}
+    \end{withoutheadline}
+}
+
+\newcommand{\cev}[1]{\reflectbox{\ensuremath{\vec{\reflectbox{\ensuremath{#1}}}}}}
+
+% http://tex.stackexchange.com/questions/114321/extensible-vec-instead-of-overrightarrow
+\makeatletter
+\newcommand{\lvec}[1]{%
+    \vbox{\m@th \ialign {##\crcr
+    \vectfill\crcr\noalign{\kern-\p@ \nointerlineskip}
+    $\hfil\displaystyle{#1}\hfil$\crcr}}}
+\def\vectfill{%
+    $\m@th\smash-\mkern-7mu%
+    \cleaders\hbox{$\mkern-2mu\smash-\mkern-2mu$}\hfill
+    \mkern-7mu\raisebox{-4.45pt}[\p@][\p@]{$\mathord\mathchar"017E$}$}
+
+\renewcommand{\lvec}{%
+    \mathpalette {\overarrow@\vectfill@}}
+\def\vectfill@{\arrowfill@\relbar\relbar{\raisebox{-4.45pt}[\p@][\p@]{$\mathord\mathchar"017E$}}}
+
+\renewcommand{\lvec}{%
+    \mathpalette {\overarrow@\vectfillb@}}
+\newcommand{\vecbar}{%
+    \scalebox{1}[0.86]{$\relbar$}}
+\def\vectfillb@{\arrowfill@\vecbar\vecbar{\raisebox{-4.69pt}[\p@][\p@]{$\mathord\mathchar"017E$}}}
+\makeatother
+
+
+
+\newcommand{\hvector}[1]{
+    \begin{bmatrix}
+    #1
+    \end{bmatrix}
+}
+
+\newcommand{\tvector}[1]{
+    \begin{bmatrix}
+    #1
+    \end{bmatrix}^T
+}
+
+\renewcommand{\matrix}[1]{
+    \begin{bmatrix}
+    #1
+    \end{bmatrix}
+}

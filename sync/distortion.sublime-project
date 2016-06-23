@@ -1,0 +1,32 @@
+{
+    "build_systems":
+    [
+        {
+            "name": "distortion",
+            "target": "minion",
+            "working_dir": "${project_path}",
+            "cmd": ["python3", "capture.py", "output.avi", "0"],
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "selector": "source.python",
+            "ignore_errors": "(?:.*backend_gtk3.py.*|.*\\(main.py:.*\\): WARNING.*Failed to connect.*|.*GLib.source_remove\\(self\\._idle_draw_id\\).*)",
+            "variants":
+            [
+                {
+                    "name": "Sync",
+                    "cmd": ["python3", "sync.py"],
+                },
+                {
+                    "name": "Syntax Check",
+                    "shell_cmd": "python -m py_compile \"${file}\"",
+                }
+            ]
+        }
+    ],
+
+    "folders":
+    [
+        {
+            "path": "."
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "latex",
+			"target": "minion",
+			"main": "main.tex",
+			"working_dir": "${project_path}",
+			"verbose": false
+		}	
+	],
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+}

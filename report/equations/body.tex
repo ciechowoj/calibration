@@ -1,0 +1,130 @@
+
+
+\nmatheq {
+    P_z^{iT}b \cdot \frac{T_x^i}{T_z^i} - P_x^{iT}b &= 0 \\
+    P_z^{iT}b \cdot \frac{T_y^i}{T_z^i} - P_y^{iT}b &= 0 \\
+    P_{z0}^i \frac{T_x^i}{T_z^i} b_x +
+    P_{z1}^i \frac{T_x^i}{T_z^i} b_y +
+    P_{z2}^i \frac{T_x^i}{T_z^i} b_z +
+    P_{z3}^i \frac{T_x^i}{T_z^i} b_w -
+    P_{x0}^i b_x +
+    P_{x1}^i b_y +
+    P_{x2}^i b_z +
+    P_{x3}^i b_w &= 0 \\
+    P_{z0}^i \frac{T_y^i}{T_z^i} b_x +
+    P_{z1}^i \frac{T_y^i}{T_z^i} b_y +
+    P_{z2}^i \frac{T_y^i}{T_z^i} b_z +
+    P_{z3}^i \frac{T_y^i}{T_z^i} b_w -
+    P_{y0}^i b_x +
+    P_{y1}^i b_y +
+    P_{y2}^i b_z +
+    P_{y3}^i b_w &= 0 \\
+    \left( P_{z0}^i \frac{T_x^i}{T_z^i} - P_{x0}^i \right) b_x +
+    \left( P_{z1}^i \frac{T_x^i}{T_z^i} - P_{x1}^i \right) b_y +
+    \left( P_{z2}^i \frac{T_x^i}{T_z^i} - P_{x2}^i \right) b_z +
+    \left( P_{z3}^i \frac{T_x^i}{T_z^i} - P_{x3}^i \right) b_w &= 0 \\
+    \left( P_{z0}^i \frac{T_y^i}{T_z^i} - P_{y0}^i \right) b_x +
+    \left( P_{z1}^i \frac{T_y^i}{T_z^i} - P_{y1}^i \right) b_y +
+    \left( P_{z2}^i \frac{T_y^i}{T_z^i} - P_{y2}^i \right) b_z +
+    \left( P_{z3}^i \frac{T_y^i}{T_z^i} - P_{y3}^i \right) b_w &= 0 \\
+}
+
+\matheq {
+    \matrix {
+        P_{z0}^1 \frac{T_x^1}{T_z^1} - P_{x0}^1 & P_{z1}^1\frac{T_x^1}{T_z^1} - P_{x1}^1 & P_{z2}^1\frac{T_x^1}{T_z^1} - P_{x2}^1 & P_{z3}^1 \frac{T_x^1}{T_z^1} - P_{x3}^1 \\[6pt]
+        P_{z0}^1 \frac{T_y^1}{T_z^1} - P_{y0}^1 & P_{z1}^1\frac{T_y^1}{T_z^1} - P_{y1}^1 & P_{z2}^1\frac{T_y^1}{T_z^1} - P_{y2}^1 & P_{z3}^1 \frac{T_y^1}{T_z^1} - P_{y3}^1 \\[6pt]
+        \vdots & \vdots & \vdots & \vdots \\
+        P_{z0}^m \frac{T_x^m}{T_z^m} - P_{x0}^m & P_{z1}^m\frac{T_x^m}{T_z^m} - P_{x1}^m & P_{z2}^m\frac{T_x^m}{T_z^m} - P_{x2}^m & P_{z3}^m \frac{T_x^m}{T_z^m} - P_{x3}^m \\[6pt]
+        P_{z0}^m \frac{T_y^m}{T_z^m} - P_{y0}^m & P_{z1}^m\frac{T_y^m}{T_z^m} - P_{y1}^m & P_{z2}^m\frac{T_y^m}{T_z^m} - P_{y2}^m & P_{z3}^m \frac{T_y^m}{T_z^m} - P_{y3}^m \\[6pt]
+    }
+    \cdot
+    \matrix{b_x \\ b_y \\ b_z \\ b_w} = 0
+}
+
+
+\matheq {
+    K^i =
+    \matrix {
+        f^i & 0 & u_0^1 \\
+        0 & \alpha f^i & v_0^1 \\
+        0 & 0 & -1 \\
+    }
+    =
+    \matrix {
+        f^i & 0 & 0 \\
+        0 & f^i & 0 \\
+        0 & 0 & -1 \\
+    }
+}
+
+\matheq {
+    M^i = K^i \cdot R^i =
+    \matrix {
+        f^i & 0 & 0 \\
+        0 & f^i & 0 \\
+        0 & 0 & -1 \\
+    }
+    \cdot
+    \matrix {
+        R_x^{iT} \\
+        R_y^{iT} \\
+        R_z^{iT}
+    }
+    =
+    \matrix {
+        f^i \cdot R_x^{iT} \\
+        f^i \cdot R_y^{iT} \\
+        -R_z^{iT}
+    }
+}
+
+\matheq {
+    M_x^{iT} \cdot M_x^{iT} = M_y^{iT} \cdot M_y^{iT} \\
+    M_x^{iT} \cdot M_y^{iT} = 0 \\
+    M_y^{iT} \cdot M_z^{iT} = 0 \\
+    M_z^{iT} \cdot M_x^{iT} = 0
+}
+
+\matheq {
+    Q =
+    \matrix {
+        q_{00} & q_{01} & q_{02} & q_{03} \\
+        q_{01} & q_{11} & q_{12} & q_{13} \\
+        q_{02} & q_{12} & q_{22} & q_{23} \\
+        q_{03} & q_{13} & q_{23} & q_{33}
+    } \\
+    MM^T = PQP^T
+}
+
+\matheq {
+    P_x^{iT} Q P_x^i - P_y^{iT} Q P_y^i &= 0 \\
+    P_x^{iT} Q P_y^i &= 0\\
+    P_y^{iT} Q P_z^i &= 0\\
+    P_z^{iT} Q P_x^i &= 0\\
+    \matrix {
+        P_{x0}^{i} q_{00} + P_{x1}^{i} q_{01} + P_{x2}^{i} q_{02} + P_{x3}^{i} q_{03} \\
+        P_{x0}^{i} q_{01} + P_{x1}^{i} q_{11} + P_{x2}^{i} q_{12} + P_{x3}^{i} q_{13} \\
+        P_{x0}^{i} q_{02} + P_{x1}^{i} q_{12} + P_{x2}^{i} q_{22} + P_{x3}^{i} q_{23} \\
+        P_{x0}^{i} q_{03} + P_{x1}^{i} q_{13} + P_{x2}^{i} q_{23} + P_{x3}^{i} q_{33} \\
+    }^T
+    \matrix {
+        P_{x0}^i \\ P_{x1}^i \\ P_{x2}^i \\ P_{x3}^i
+    }
+    -
+    \matrix {
+        P_{y0}^{i} q_{00} + P_{y1}^{i} q_{01} + P_{y2}^{i} q_{02} + P_{y3}^{i} q_{03} \\
+        P_{y0}^{i} q_{01} + P_{y1}^{i} q_{11} + P_{y2}^{i} q_{12} + P_{y3}^{i} q_{13} \\
+        P_{y0}^{i} q_{02} + P_{y1}^{i} q_{12} + P_{y2}^{i} q_{22} + P_{y3}^{i} q_{23} \\
+        P_{y0}^{i} q_{03} + P_{y1}^{i} q_{13} + P_{y2}^{i} q_{23} + P_{y3}^{i} q_{33} \\
+    }^T
+    \matrix {
+        P_{y0}^i \\ P_{y1}^i \\ P_{y2}^i \\ P_{y3}^i
+    } &= 0 \\
+    \left( P_{x0}^{i}P_{x0}^{i} - P_{y0}^{i}P_{y0}^{i} \right) q_{00} + \left( P_{x1}^{i}P_{x0}^{i} - P_{y1}^{i}P_{y0}^{i} \right) q_{01} + \left( P_{x2}^{i}P_{x0}^{i} - P_{y2}^{i}P_{y0}^{i} \right) q_{02} + \left( P_{x3}^{i}P_{x0}^{i} - P_{x3}^{i}P_{x0}^{i} \right) q_{03} &+ \\
+    \left( P_{x0}^{i}P_{x1}^{i} - P_{y0}^{i}P_{y1}^{i} \right) q_{01} + \left( P_{x1}^{i}P_{x1}^{i} - P_{y1}^{i}P_{y1}^{i} \right) q_{11} + \left( P_{x2}^{i}P_{x1}^{i} - P_{y2}^{i}P_{y1}^{i} \right) q_{12} + \left( P_{x3}^{i}P_{x1}^{i} - P_{x3}^{i}P_{x1}^{i} \right) q_{13} &+ \\
+    \left( P_{x0}^{i}P_{x2}^{i} - P_{y0}^{i}P_{y2}^{i} \right) q_{02} + \left( P_{x1}^{i}P_{x2}^{i} - P_{y1}^{i}P_{y2}^{i} \right) q_{12} + \left( P_{x2}^{i}P_{x2}^{i} - P_{y2}^{i}P_{y2}^{i} \right) q_{22} + \left( P_{x3}^{i}P_{x2}^{i} - P_{x3}^{i}P_{x2}^{i} \right) q_{23} &+ \\
+    \left( P_{x0}^{i}P_{x3}^{i} - P_{y0}^{i}P_{y3}^{i} \right) q_{03} + \left( P_{x1}^{i}P_{x3}^{i} - P_{y1}^{i}P_{y3}^{i} \right) q_{13} + \left( P_{x2}^{i}P_{x3}^{i} - P_{y2}^{i}P_{y3}^{i} \right) q_{23} + \left( P_{x3}^{i}P_{x3}^{i} - P_{x3}^{i}P_{x3}^{i} \right) q_{33} &= 0 \\
+}
+
+
+

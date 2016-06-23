@@ -1,32 +1,3 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -117,11 +88,5 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Sublime text
+# Sublime Text 3 project settings
 *.sublime-workspace
-myplot.png
-scene.png
-view.png
-paper/*
-*.mp4
-*.m4v
