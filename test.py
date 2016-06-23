@@ -869,10 +869,10 @@ def create_dataset(path, W, X, R, percent, error):
     W = remove_point_locations(W, percent)
 
     file.write("#resolutions\n")
-    file.write(str(R[0][0]) + ";" + " " + str(R[0][1]) + ";")
+    file.write(str(R[0][0]) + ";" + " " + str(R[0][1]))
 
     for r in R[1:]:
-        file.write(" " + str(r[0]) + ";" + " " + str(r[1]) + ";")
+        file.write("; " + str(r[0]) + ";" + " " + str(r[1]))
 
     file.write("\n\n#truth\n")
     data = False
@@ -883,14 +883,14 @@ def create_dataset(path, W, X, R, percent, error):
             data = True
 
         file.write(str(i) + "; ")
-        file.write("{:.2f}".format(i / 30) + ";")
+        file.write("{:.2f}".format(i / 30))
 
         x = (random() * 2.0 - 1.0) * error
         y = (random() * 2.0 - 1.0) * error
 
         for j in range(W.shape[0] // 3):
-            file.write(" " + "{:.0f}".format(floor(W[j * 3 + 0, i] + x)) + ";")
-            file.write(" " + "{:.0f}".format(floor(W[j * 3 + 1, i] + y)) + ";")
+            file.write("; " + "{:.7f}".format(W[j * 3 + 0, i] + x))
+            file.write("; " + "{:.7f}".format(W[j * 3 + 1, i] + y))
 
         file.write("\n")
 
@@ -902,13 +902,19 @@ def create_dataset(path, W, X, R, percent, error):
         truth.write(" " + str(X[2, i]) + "\n")
 
 def create_datasets():
-    create_dataset("data/testset_0_0.csv", W, X[:, :25], resolutions, 0.0, 0)
-    create_dataset("data/testset_1_0.csv", W, X[:, :25], resolutions, 0.1, 0)
-    create_dataset("data/testset_2_0.csv", W, X[:, :25], resolutions, 0.2, 0)
-    create_dataset("data/testset_4_0.csv", W, X[:, :25], resolutions, 0.4, 0)
-    create_dataset("data/testset_8_0.csv", W, X[:, :25], resolutions, 0.8, 0)
-    create_dataset("data/testset_0_10.csv", W, X[:, :25], resolutions, 0.0, 10)
-    create_dataset("data/testset_1_10.csv", W, X[:, :25], resolutions, 0.1, 10)
-    create_dataset("data/testset_2_10.csv", W, X[:, :25], resolutions, 0.2, 10)
-    create_dataset("data/testset_4_10.csv", W, X[:, :25], resolutions, 0.4, 10)
-    create_dataset("data/testset_8_10.csv", W, X[:, :25], resolutions, 0.8, 10)
+    X = make_test_points2()[:, :100]
+
+    cameras = camera_test_set1()[0:10]
+    resolutions = [camera[1] for camera in cameras]
+
+    def camera_matrix(cameras):
+        return vstack([camera[0] for camera in cameras])
+
+    P = camera_matrix(cameras)
+    W = dot(P, X)
+    W = remove_projective_depths(W)
+
+    create_dataset("data/testset_0_0.csv", W,  X[:, :25], resolutions, 0.0, 0)
+    create_dataset("data/testset_1_0.csv", W,  X[:, :25], resolutions, 0.1, 0)
+    create_dataset("data/testset_2_0.csv", W,  X[:, :25], resolutions, 0.2, 0)
+    create_dataset("data/testset_4_0.csv", W,  X[:, :25], resolutions, 0.4, 0)

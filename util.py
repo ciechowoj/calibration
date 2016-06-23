@@ -245,8 +245,8 @@ def normalization_matrix(W):
         [0, dev[1], -avg[1] * dev[1]],
         [0, 0, 1]])
 
-def right_epipole(F):
-    U, S, V = svd(F)
+def left_epipole(F):
+    U, S, V = svd(F.T)
     return V[-1,:]
 
 # W0 F W1 = 0
@@ -301,7 +301,7 @@ def print_matrix(M):
 def recover_projective_depths(A, B):
     B = B.copy()
     F = fundamental_matrix(B, A)
-    e = right_epipole(F.T)
+    e = left_epipole(F)
     B[2] = ones(B.shape[1])
 
     for k in range(A.shape[1]):
@@ -329,7 +329,7 @@ def recover_all_projective_depths(W):
     for i in range(0, W.shape[0] // 3):
         if i != j:
             F = fundamental_matrix(W[i * 3:i * 3 + 3], W[j * 3:j * 3 + 3])
-            e = right_epipole(F.T)
+            e = left_epipole(F)
 
             for k in range(W.shape[1]):
                 qi = W[i * 3:i * 3 + 3, k]
@@ -440,6 +440,8 @@ def reconstruct_missing_data(W, threshold = 8):
     iteration = 0
 
     while m != len(rI) and n != len(cI):
+        print("Iteration ", iteration, flush = True)
+
         # Find a row with the greatest number of filled elements.
 
         best = (0, -1)
@@ -489,7 +491,6 @@ def reconstruct_missing_data(W, threshold = 8):
 
         print_matrix(W)
 
-        print("Iteration ", iteration, flush = True)
         iteration += 1
 
     return W
@@ -497,7 +498,7 @@ def reconstruct_missing_data(W, threshold = 8):
 def balance_measurement_matrix(W):
     W = W.copy()
 
-    for k in range(2):
+    for k in range(4):
         S = sqrt(1.0 / sum(W * W, axis = 0))
 
         W *= S
@@ -517,14 +518,17 @@ def isntnan(x):
 
 def load_measurements(path):
     file = open(path)
-    lines = [line for line in file.readlines() if len(line) > 10 and not line.startswith('#')]
+    lines = [line for line in file.readlines() if len(line) > 4 and not line.startswith('#')]
 
-    num_points = len(lines)
-    num_cameras = (len(lines[0].split(";")) - 2) // 2
+    resolutions = list(map(lambda x: int(x.strip()), lines[0].split(";")))
+    resolutions = [(resolutions[i * 2 + 0], resolutions[i * 2 + 1]) for i in range(len(resolutions) // 2)]
+
+    num_points = len(lines) - 1
+    num_cameras = (len(lines[1].split(";")) - 2) // 2
 
     W = empty((num_cameras * 3, num_points))
 
-    for i, line in enumerate(lines):
+    for i, line in enumerate(lines[1:]):
         fields = list(map(lambda x: float(x.strip()), line.split(";")))[2:]
 
         for j in range(num_cameras):
@@ -539,7 +543,7 @@ def load_measurements(path):
                 W[j * 3 + 1, i] = y
                 W[j * 3 + 2, i] = 1.0
 
-    return W
+    return W, resolutions
 
 def load_truth(path, scale = 1.0):
     file = open(path)
