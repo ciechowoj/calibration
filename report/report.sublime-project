@@ -4,8 +4,22 @@
 		{
 			"name": "latex",
 			"target": "minion",
+			"cmd": ["pdflatex", "-output-directory", "build", "main.tex"],
 			"main": "main.tex",
 			"working_dir": "${project_path}",
+			"ignore_errors": [
+				"This is pdfTeX, Version.*",
+				"restricted \\write18 enabled.",
+				"entering extended mode",
+				"LaTeX2e <.*>",
+				"\\(\\./.*\\.tex$",
+				"Babel .* and hyphenation patterns .*",
+				".*/usr/share/texlive/texmf-dist/.*",
+				"Document Class: article 2014/09/29 v1\\.4h Standard LaTeX document class",
+				"For additional information on amsmath, use the ... option.",
+				"\\\\@input{.*}",
+				"\\[Loading MPS to PDF converter \\(version .*\\)\\.\\]"
+			],
 			"verbose": false
 		}	
 	],

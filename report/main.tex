@@ -25,18 +25,20 @@
 \thispagestyle{empty}
 \newpage
 
-\section{Abstract}
-This report describes a simplified implementation of algorithm presented in "A Convenient Multi-Camera
-Self-Calibration for Virtual
-Environments" paper by Svoboda et al. \cite{svoboda05}. The implementation was created as the final project for the ,,Digitalizing The Real World'' course at Wrocław University.
-
-
 \section{Introduction}
-An aim of the algorithm described in this report is to compute the positions and intrinsic parameters for a set of cameras. The input of the algorithm are projections of point cloud (the locations of points in the images from cameras) associated with respective cameras. The algorithm also computes the global positions of points from the point cloud as a side effect. The point cloud projections could be created by tracking some bright object like modified laser pointer (as in \cite{svoboda05}) or diffuse LED diode, as in experiment conducted with this implementation. The detection of the bright spot on the images isn't in the scope of this report.
+There is many applications for Multi-Camera setups in computing industry. Motion Capture studios use multiple cameras for tracking special markers. Multiple cameras are used to track the position of emerging VR headsets. The systems of multiple cameras are becoming indispensable piece of modern technology.
+
+The majority of such systems requires some kind of calibration before being ready to provide target functionality. The calibration is a process of estimating mutual position and orientation of cameras with respect to each other and to surrounding environments and sometimes the parameters of cameras itself.
+
+There are a few ways to do the calibration. A one way is to use the cameras itself. This report describes a simplified implementation of algorithm presented in "A Convenient Multi-Camera Self-Calibration for Virtual Environments" paper by Svoboda et al. \cite{svoboda05}.
+
+The algorithm uses correspondence and position of points seen from different cameras of the systems. The points are created by waving some bright object (like modified laser pointer or diffuse LED diode). The bright object will be called the pointer in the rest of paper. The full version of the algorithm is very robust, it is immune for measurement noise and significant amount of occlusions (the pointer doesn't have to be visible from all cameras at once).
+
+Images of the pointer seen from different cameras can be easily matched to each other (if cameras are synchronized, the images seen at the same frame are the matching ones). It is relatively easy to detect the pointer position on the image from the camera as it has very high intensity with  the comparison to the environment.
 
 \section{Algorithm Outline}
 
-The pixel locations of the points from the point cloud will be called an image projections. Let $q_i^j$ be the image projection of i-th point from j-th camera. The image projection has form $q_i^j = \begin{bmatrix} x_i^j & y_i^j & 1 \end{bmatrix}^T$, where $x_i^j$ and $y_i^j$ are pixel coordinates in a system, which has an origin at the center of the image and which has x and y axes pointing left and up respectively. We can arrange all such image projections in a matrix $W$ called measurement matrix. Some of the fields in the measurement matrix may be empty due to occlusions (a point can be invisible from given camera, occluded by some other object or the procedure that localized the bright spot on the image may fail and not report any location). Equation \ref{eq:w1} shows the measurement matrix with some elements missing (marked as $\times$).
+The positions of the pointer across different time moments (on different frames from the camera capture) forms a point cloud. The pixel locations of the points from the point cloud will be called an image projections. Let $q_i^j$ be the image projection of i-th point from j-th camera. The image projection has form $q_i^j = \begin{bmatrix} x_i^j & y_i^j & 1 \end{bmatrix}^T$, where $x_i^j$ and $y_i^j$ are pixel coordinates in a system, which has an origin at the center of the image and which has x and y axes pointing left and up respectively. We can arrange all such image projections in a matrix $W$ called measurement matrix. Some of the fields in the measurement matrix may be empty due to occlusions (a point can be invisible from given camera, occluded by some other object or the procedure that localized the bright spot on the image may fail and not report any location). Equation \ref{eq:w1} shows the measurement matrix with some elements missing (marked as $\times$).
 
 \nmatheq {
     \label{eq:w1}
