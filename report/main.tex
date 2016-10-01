@@ -8,12 +8,11 @@
 \usepackage{rotating}
 \usepackage{mathtools}
 \usepackage{lmodern}
+\usepackage{color}
 
 \title{\textbf{Multi-Camera Self-Calibration}\\{\large Technical report}}
 \author{Wojciech Szęszoł\thanks{\textit{e-mail}:\texttt{ciechowoj@gmail.com}}}
 \date{Wrocław, \today}
-
-
 
 \include{haste}
 
@@ -21,43 +20,42 @@
 
 \maketitle
 
-
 \thispagestyle{empty}
 \newpage
 
 \section{Introduction}
 
-There is many applications for Multi-Camera setups in computing industry. Motion
-Capture studios use multiple cameras for tracking special markers. Multiple
-cameras are used to track the position of emerging VR headsets. The systems of
+There are many applications for multi-camera systems in computing industry. Motion capture studios use multiple cameras for tracking special markers. Multiple
+cameras are used to track the position headsets in emerging VR technology. The systems of
 multiple cameras are becoming indispensable piece of modern technology.
 
-The majority of such systems requires some kind of calibration before being
-ready to provide target functionality. The calibration is a process of
-estimating mutual position and orientation of cameras with respect to each other
+The majority of such systems require some kind of calibration before being
+ready to provide target functionality. Calibration is the process of
+estimating position and orientation of cameras with respect to each other
 and to surrounding environments and sometimes the parameters of cameras itself.
 
-There are a few ways to do the calibration. A one way is to use the cameras
-itself. This report  describes a simplified implementation of algorithm
-presented in "A Convenient Multi-Camera  Self-Calibration for Virtual
-Environments" paper by Svoboda et al. \cite{svoboda05}.
+There are multiple ways to do the calibration. One way is to exploit the
+geometrical relationships between inputs from the cameras itself. This report
+describes a simplified implementation of algorithm presented in "A Convenient
+Multi-Camera  Self-Calibration for Virtual Environments" paper by Svoboda et al.
+\cite{svoboda05}.
 
 The algorithm uses correspondence and position of points seen from different
-cameras of the systems. The points are created by waving some bright object
+cameras of the system. The points are created by waving some bright object
 (like modified laser pointer or diffuse LED diode). The bright object will be
-called the pointer in the rest of paper. The full  version of the algorithm is
-very robust, it is immune for measurement noise and significant  amount of
+called a pointer in the rest of the paper. A full version of the algorithm is
+very robust, it is immune for measurement noise and significant amount of
 occlusions (the pointer doesn't have to be visible from all cameras at once).
 
 Images of the pointer seen from different cameras can be easily matched to each
 other (if cameras are synchronized, the images seen at the same frame are the
 matching ones). It is relatively easy to detect the pointer position on the
-image from the camera as it has very high  intensity with  the comparison to the
+image from the camera as it has very high intensity in comparison to the
 environment.
 
 \section{Algorithm Outline}
 
-The positions of the pointer across different time moments (on different frames
+The 3D positions of the pointer across different time moments (on different frames
 from the camera  capture) forms a point cloud. The pixel locations of the points
 from the point cloud will be  called an image projections. Let $q_i^j$ be the
 image projection of i-th point from j-th  camera. The image projection has form
@@ -144,9 +142,9 @@ factorization of the rescaled measurement matrix.
 }
 
 If the real world locations of some (at least three which are not co-linear)
-points $Q_i$ are known the recovered structures can be aligned with real world
+points $Q_i$ are known, the recovered structures can be aligned with real world
 frame of reference (otherwise the scale, rotation and translation of recovered
-structures are completely arbitrary). So, the outline of the algorithm is (and
+structures are completely arbitrary). The outline of the algorithm is (and
 the each step will be described in following sections):
 
 \begin{enumerate}
@@ -157,14 +155,15 @@ the each step will be described in following sections):
 \item Align recovered structures with real world frame of reference.
 \end{enumerate}
 
-The steps 1. and 2. have to be done together, they need to be repeated a few
-times to recover rescaled measurement matrix from partial measurement matrix.
+The steps 1. and 2. have to be done together, as explained in the next section,
+they need to be repeated a few times to recover rescaled measurement matrix from
+partial measurement matrix.
 
 \section{Filling Gaps}
 \subsection{Recovering the projective depths}
 
 Before trying to fill missing elements, the projective depths of known points
-needs to be computed. Observe, that any column and any triple of rows associated
+need to be computed. Observe, that any column and any triple of rows associated
 with some camera matrix  $P_j$ of the rescaled measurement matrix can be
 multiplied with nonzero scalar without  changing the informations the rescaled
 measurement matrix contains (e.g. the camera parameters  or the point
@@ -177,14 +176,14 @@ projective depths of some other row $k$ with respect to   fixed one $j$, a
 fundamental matrix $F^{jk}$ and a left epipole $e^{jk}$ need to be computed
 \cite{sturm96}. It can be done with the eight point algorithm \cite{hartley95}
 (there are   also seven and five point variations \cite{stewenius06}, however
-the implementation uses only    the simplest, eight point one), then the
-projective depths can be computed according to     equation:
+my implementation uses only    the simplest, eight point one), then the
+projective depths can be computed according to equation:
 
 \nmatheq {
     \lambda_i^k = \frac{(e^{jk} \times q_i^k) \cdot (F^{jk} q_i^j)}{\norm{e^{jk} \times q_i^k}^2} \lambda_i^j
 }
 
-The function that does above is called \code{recover\_projective\_depths}, it
+The function that does the above is called \code{recover\_projective\_depths}, it
 takes two $3 \times n$ matrices \code{A} and \code{B}. It assumes that
 projective depths in \code{A} are known and returns a new matrix that is copy of
 \code{B} with projective depths filled in. The fundamental matrix and the left
@@ -216,8 +215,8 @@ tuple $B_t$ can be created from $A_t$ by replacing all of the unknown elements
 with $0$ and adding some extra columns for the incomplete ones. For  every
 column that doesn't have some projective depth, an extra column with zeros and
 known  image projections should be added. If some column doesn't contain given
-point at all, a triple   of columns with the standard basis spanning the
-dimensions of unknown point should be added.   Equation \ref{eq:extendAt}
+point at all, a triple of columns with the standard basis spanning the
+dimensions of unknown point should be added. Equation \ref{eq:extendAt}
 illustrates it.
 
 \nmatheq {
@@ -283,7 +282,7 @@ triples of rows are rescaled, so that $\forall_{1 \leq j \leq m} \sum_{i=0}^n
 \left( (\lambda _i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2
 \right) = 1$. The balancing is done with \code{balance\_measurement\_matrix}
 function. In (\cite{sturm96}) it is suggested to repeat balancing until the
-measurement matrix  changes, however in the implementation number of balancing
+measurement matrix  changes, however in my implementation number of balancing
 steps is fixed to some constant.
 
 After balancing, the matrix can be factorized with SVD. Equation \ref{eq:rank4}
@@ -342,7 +341,7 @@ positions at least three point in real world that are not lying on the same line
 are needed. In the face of noise additional locations will improve the accuracy
 though. A system of linear equations can be created and solved with SVD to
 compute a matrix that transform the structures to the world coordinate system.
-In the implementation \code{find\_frame\_of\_reference} is the function which
+In my implementation \code{find\_frame\_of\_reference} is the function which
 does that.
 
 \section{Dissecting the Camera Matrix}
@@ -353,7 +352,7 @@ does the job is called \code{decompose}, it takes a camera matrix and returns
 tuple $(K, R, T)$ with matrix of intrinsic parameters, rotation and translation
 vector. First the $P$ matrix is factorized with the RQ algorithm $\bar{K},
 \bar{R} = rq(P[:3, :3])$. This factorization is slightly ambiguous and following
-steps are done to fix it (the fixed matrices will be called $\bar{K}'$ and
+steps are carried out to fix it \textcolor{red}{CAN YOU EXPLAIN WHERE THESE STEPS COME FROM? FROM THE PAPER?} (the fixed matrices will be called $\bar{K}'$ and
 $\bar{R}'$):
 
 \begin{enumerate}
@@ -361,7 +360,7 @@ $\bar{R}'$):
 of $\bar{R}$ by $-1$.
 \item If $\bar{K}_{11}$ is negative multiply both the second column of $\bar{K}$ and second row
 of $\bar{R}$ by $-1$.
-\item If $\bar{K}_{22}$ is positive (cameras from the implementation has reversed z-axis)
+\item If $\bar{K}_{22}$ is positive (cameras from my implementation has reversed z-axis)
 multiply both the third column of $\bar{K}$ and third row of $\bar{R}$ by $-1$.
 \item If determinant of $\bar{R}$ is negative multiply the whole matrix by $-1$.
 \end{enumerate}
@@ -373,10 +372,10 @@ P[:3, 3]$. The  last thing is to remove scaling from $\bar{K}$: $K =
 \section{Experiments}
 
 Six experiments were conducted, on two test scenes, including one with real
-data. Image  \ref{fig:artificial} presents the artificial scene. It consist of
-10 cameras, the test points  were randomly drawn from the sphere. Image
-\ref{fig:real} shows the arrangement of cameras on  real scene. The points were
+data. \textcolor{red}{[YOUR NOISE]} Figure \ref{fig:artificial} presents the artificial scene. It consist of 10 cameras, the test points  were randomly drawn from the sphere. Figure \ref{fig:real} shows the arrangement of cameras on  real scene. The points were
 generated by tracking bright diffuse LED.
+
+\textcolor{red}{YOU SHOULD AT LEAST INCLUDE A SENTENCE SAYING THAT THE IMPLEMENTATION WORKS WHEN THERE IS NO NOISE IN THE SYSTEM? WITH PERFECT SYNTHETIC DATA, THE RESUTLS ARE PERFECT?}
 
 \begin{figure}[ht]
 \centering
@@ -413,6 +412,7 @@ Following table summarizes conducted test.
 \code{dataset3}   & 5 & 263 & 14 \\ \hline
 \code{dataset4}   & 5 & 282 & 21 \\ \hline
 \end{tabular}
+\caption{\textcolor{red}{ADD A CAPTION HERE. YOU CAN ALSO ADD SOME ERROR MEASUREMENT IN PERCENTAGE FOR EXAMPLE}}
 \end{table}
 
 The algorithm turned out to be very sensitive to noise. In the case of the
@@ -423,7 +423,7 @@ removed from some cameras in artificial scene. The algorithm performs  stably up
 to $40\%$ of removed points. Despite the high sensitivity to the noise in the
 artificial case, recovering cameras from real  scene was quite successful.
 Following table presents real (with precision $0.1m$ precision) and  recovered
-positions of cameras. In the case of real scene the implementation tolerates up
+positions of cameras. In the case of real scene my implementation tolerates up
 to  10\% of missing points.
 
 \begin{table}[ht]
@@ -448,9 +448,9 @@ Implemented algorithm turned out to be very sensitive to noise. It could have
 been expected, as  some steps of original implementation was skipped
 \cite{svoboda05}. The major problem is a   lack of any iterative refinement of
 intermediate results (e.g. optimizing projective structure   with Bundle
-Adjustment, before factorization). The implementation has not means to handle
+Adjustment, before factorization). My implementation has not means to handle
 outliers. Sampling the columns for estimation of the column space basis could be
-done way    better. An order of computation of fundamental matrices is being
+done way better \textcolor{red}{PLEASE SOME MORE FORMAL LANGUAGE}. An order of computation of fundamental matrices is being
 chosen very naively (all    fundamental matrices are always computed with
 respect to the first triple of rows in    measurement matrix). There are plenty
 of places for improvement.
