@@ -4,7 +4,7 @@
 		{
 			"name": "latex",
 			"target": "minion",
-			"cmd": ["pdflatex", "-output-directory", "build", "main.tex"],
+			"cmd": ["make"],
 			"main": "main.tex",
 			"working_dir": "${project_path}",
 			"ignore_errors": [
@@ -21,7 +21,7 @@
 				"\\[Loading MPS to PDF converter \\(version .*\\)\\.\\]"
 			],
 			"verbose": false
-		}	
+		}
 	],
 	"folders":
 	[

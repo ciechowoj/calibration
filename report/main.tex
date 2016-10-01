@@ -26,19 +26,50 @@
 \newpage
 
 \section{Introduction}
-There is many applications for Multi-Camera setups in computing industry. Motion Capture studios use multiple cameras for tracking special markers. Multiple cameras are used to track the position of emerging VR headsets. The systems of multiple cameras are becoming indispensable piece of modern technology.
 
-The majority of such systems requires some kind of calibration before being ready to provide target functionality. The calibration is a process of estimating mutual position and orientation of cameras with respect to each other and to surrounding environments and sometimes the parameters of cameras itself.
+There is many applications for Multi-Camera setups in computing industry. Motion
+Capture studios use multiple cameras for tracking special markers. Multiple
+cameras are used to track the position of emerging VR headsets. The systems of
+multiple cameras are becoming indispensable piece of modern technology.
 
-There are a few ways to do the calibration. A one way is to use the cameras itself. This report describes a simplified implementation of algorithm presented in "A Convenient Multi-Camera Self-Calibration for Virtual Environments" paper by Svoboda et al. \cite{svoboda05}.
+The majority of such systems requires some kind of calibration before being
+ready to provide target functionality. The calibration is a process of
+estimating mutual position and orientation of cameras with respect to each other
+and to surrounding environments and sometimes the parameters of cameras itself.
 
-The algorithm uses correspondence and position of points seen from different cameras of the systems. The points are created by waving some bright object (like modified laser pointer or diffuse LED diode). The bright object will be called the pointer in the rest of paper. The full version of the algorithm is very robust, it is immune for measurement noise and significant amount of occlusions (the pointer doesn't have to be visible from all cameras at once).
+There are a few ways to do the calibration. A one way is to use the cameras
+itself. This report  describes a simplified implementation of algorithm
+presented in "A Convenient Multi-Camera  Self-Calibration for Virtual
+Environments" paper by Svoboda et al. \cite{svoboda05}.
 
-Images of the pointer seen from different cameras can be easily matched to each other (if cameras are synchronized, the images seen at the same frame are the matching ones). It is relatively easy to detect the pointer position on the image from the camera as it has very high intensity with  the comparison to the environment.
+The algorithm uses correspondence and position of points seen from different
+cameras of the systems. The points are created by waving some bright object
+(like modified laser pointer or diffuse LED diode). The bright object will be
+called the pointer in the rest of paper. The full  version of the algorithm is
+very robust, it is immune for measurement noise and significant  amount of
+occlusions (the pointer doesn't have to be visible from all cameras at once).
+
+Images of the pointer seen from different cameras can be easily matched to each
+other (if cameras are synchronized, the images seen at the same frame are the
+matching ones). It is relatively easy to detect the pointer position on the
+image from the camera as it has very high  intensity with  the comparison to the
+environment.
 
 \section{Algorithm Outline}
 
-The positions of the pointer across different time moments (on different frames from the camera capture) forms a point cloud. The pixel locations of the points from the point cloud will be called an image projections. Let $q_i^j$ be the image projection of i-th point from j-th camera. The image projection has form $q_i^j = \begin{bmatrix} x_i^j & y_i^j & 1 \end{bmatrix}^T$, where $x_i^j$ and $y_i^j$ are pixel coordinates in a system, which has an origin at the center of the image and which has x and y axes pointing left and up respectively. We can arrange all such image projections in a matrix $W$ called measurement matrix. Some of the fields in the measurement matrix may be empty due to occlusions (a point can be invisible from given camera, occluded by some other object or the procedure that localized the bright spot on the image may fail and not report any location). Equation \ref{eq:w1} shows the measurement matrix with some elements missing (marked as $\times$).
+The positions of the pointer across different time moments (on different frames
+from the camera  capture) forms a point cloud. The pixel locations of the points
+from the point cloud will be  called an image projections. Let $q_i^j$ be the
+image projection of i-th point from j-th  camera. The image projection has form
+$q_i^j = \begin{bmatrix} x_i^j & y_i^j & 1 \end{bmatrix}^T$, where $x_i^j$ and
+$y_i^j$ are  pixel coordinates in a system, which has an origin at the center of
+the image and which has x   and y axes pointing left and up respectively. We can
+arrange all such image projections in a   matrix $W$ called measurement matrix.
+Some of the fields in the measurement matrix may be   empty due to occlusions (a
+point can be invisible from given camera, occluded by some other   object or the
+procedure that localized the bright spot on the image may fail and not report
+any location). Equation \ref{eq:w1} shows the measurement matrix with some
+elements missing   (marked as $\times$).
 
 \nmatheq {
     \label{eq:w1}
@@ -57,7 +88,9 @@ The positions of the pointer across different time moments (on different frames 
     \end{bmatrix}
 }
 
-Lets consider single point $Q_i$ and camera matrix $P^j$. Equation \ref{eq:projection} defines a rescaled image projection of point $Q_i$ for camera $P^j$.
+Lets consider single point $Q_i$ and camera matrix $P^j$. Equation
+\ref{eq:projection} defines a rescaled image projection of point $Q_i$ for
+camera $P^j$.
 
 \nmatheq {
     \label{eq:projection}
@@ -70,7 +103,17 @@ Lets consider single point $Q_i$ and camera matrix $P^j$. Equation \ref{eq:proje
     = P_j Q_i
 }
 
-The factors $\lambda_i^j$ are called projective depths. The image projections in the measurement matrix, that comes as the input of the algorithm have projective depths divided out. The measurement matrix $\hat{W}$ with known projective depths will be called a rescaled measurement matrix. The rescaled measurement matrix has rank four, if no noise is present. If the projective depths were known and there was no holes in the rescaled measurement matrix, it could be factorized into set of camera matrices $\hat{P}$ and set of point locations $\hat{Q}$. However, the factorization would be only up to some projective transformation. An additional Euclidean stratification step is needed to recover $P$ and $Q$ in Euclidean space. Equation \ref{eq:w2} presents the factorization of the rescaled measurement matrix.
+The factors $\lambda_i^j$ are called projective depths. The image projections in
+the measurement matrix, that comes as the input of the algorithm have projective
+depths divided out. The measurement matrix $\hat{W}$ with known projective
+depths will be called a rescaled measurement matrix. The rescaled measurement
+matrix has rank four, if no noise is present. If the projective depths were
+known and there was no holes in the rescaled measurement matrix, it could be
+factorized into set of camera matrices $\hat{P}$ and set of point locations
+$\hat{Q}$.  However, the factorization would be only up to some projective
+transformation. An additional  Euclidean stratification step is needed to
+recover $P$ and $Q$ in Euclidean space. Equation  \ref{eq:w2} presents the
+factorization of the rescaled measurement matrix.
 
 \nmatheq {
     \label{eq:w2}
@@ -100,7 +143,11 @@ The factors $\lambda_i^j$ are called projective depths. The image projections in
     \end{bmatrix}
 }
 
-If the real world locations of some (at least three which are not co-linear) points $Q_i$ are known the recovered structures can be aligned with real world frame of reference (otherwise the scale, rotation and translation of recovered structures are completely arbitrary). So, the outline of the algorithm is (and the each step will be described in following sections):
+If the real world locations of some (at least three which are not co-linear)
+points $Q_i$ are known the recovered structures can be aligned with real world
+frame of reference (otherwise the scale, rotation and translation of recovered
+structures are completely arbitrary). So, the outline of the algorithm is (and
+the each step will be described in following sections):
 
 \begin{enumerate}
 \item Fill gaps in measurement matrix.
@@ -110,23 +157,68 @@ If the real world locations of some (at least three which are not co-linear) poi
 \item Align recovered structures with real world frame of reference.
 \end{enumerate}
 
-The steps 1. and 2. have to be done together, they need to be repeated a few times to recover rescaled measurement matrix from partial measurement matrix.
+The steps 1. and 2. have to be done together, they need to be repeated a few
+times to recover rescaled measurement matrix from partial measurement matrix.
 
 \section{Filling Gaps}
 \subsection{Recovering the projective depths}
-Before trying to fill missing elements, the projective depths of known points needs to be computed. Observe, that any column and any triple of rows associated with some camera matrix $P_j$ of the rescaled measurement matrix can be multiplied with nonzero scalar without changing the informations the rescaled measurement matrix contains (e.g. the camera parameters or the point locations). The multiplication of a column is canceled by the fact that point locations are in homogeneous coordinated and $w$ component will accommodate the scaling. Camera matrices can accommodate the scaling in similar manner. That means projective depths can be fixed for single triple of rows and the rest of the depths can be calculated with respect to that fixed row. To compute projective depths of some other row $k$ with respect to fixed one $j$, a fundamental matrix $F^{jk}$ and a left epipole $e^{jk}$ need to be computed \cite{sturm96}. It can be done with the eight point algorithm \cite{hartley95} (there are also seven and five point variations \cite{stewenius06}, however the implementation uses only the simplest, eight point one), then the projective depths can be computed according to equation:
+
+Before trying to fill missing elements, the projective depths of known points
+needs to be computed. Observe, that any column and any triple of rows associated
+with some camera matrix  $P_j$ of the rescaled measurement matrix can be
+multiplied with nonzero scalar without  changing the informations the rescaled
+measurement matrix contains (e.g. the camera parameters  or the point
+locations). The multiplication of a column is canceled by the fact that point
+locations are in homogeneous coordinated and $w$ component will accommodate the
+scaling.  Camera matrices can accommodate the scaling in similar manner. That
+means projective depths  can be fixed for single triple of rows and the rest of
+the depths can be calculated with  respect to that fixed row. To compute
+projective depths of some other row $k$ with respect to   fixed one $j$, a
+fundamental matrix $F^{jk}$ and a left epipole $e^{jk}$ need to be computed
+\cite{sturm96}. It can be done with the eight point algorithm \cite{hartley95}
+(there are   also seven and five point variations \cite{stewenius06}, however
+the implementation uses only    the simplest, eight point one), then the
+projective depths can be computed according to     equation:
 
 \nmatheq {
     \lambda_i^k = \frac{(e^{jk} \times q_i^k) \cdot (F^{jk} q_i^j)}{\norm{e^{jk} \times q_i^k}^2} \lambda_i^j
 }
 
-The function that does above is called \code{recover\_projective\_depths}, it takes two $3 \times n$ matrices \code{A} and \code{B}. It assumes that projective depths in \code{A} are known and returns a new matrix that is copy of \code{B} with projective depths filled in. The fundamental matrix and the left epipole are computed with functions \code{fundamental\_matrix} and \code{left\_epipole} respectively. For numerical stability \code{fundamental\_matrix} normalizes the image projections. There is also another function \code{recover\_all\_projective\_depths} takes a $3m \times n$ matrix and computes all projective depths.
+The function that does above is called \code{recover\_projective\_depths}, it
+takes two $3 \times n$ matrices \code{A} and \code{B}. It assumes that
+projective depths in \code{A} are known and returns a new matrix that is copy of
+\code{B} with projective depths filled in. The fundamental matrix and the left
+epipole are computed with functions \code{fundamental\_matrix} and
+\code{left\_epipole} respectively. For numerical stability
+\code{fundamental\_matrix} normalizes the image projections. There is also
+another function \code{recover\_all\_projective\_depths} takes a $3m \times n$
+matrix and computes all projective depths.
 
 \subsection{Filling missing elements}
 
-A property of the rescaled measurement matrix that allows to recover its unknown elements is that in noise free conditions it has rank 4. That means its column space is four dimensional. If the basis $\mathcal{B}$ of that space is known, every other column can be expressed as linear combination of the vectors from that basis. The only condition is the column with missing elements are required to have at least four elements known (as the linear combination coefficients have to be computed first). In practice for elements means at least two image projections.
-First four element tuples $A_t$ of columns are sampled from the rescaled measurement matrix. It is not guaranteed that any of them spans the basis $\mathcal{B}$. However, the intersection of the subspaces spanned by them should span $\mathcal{B}$. That is given set $\mathcal{B}_t$ of linear subspaces generated by tuples of columns $A_t$, $\mathcal{B}$ can be computed as $\mathcal{B} = \bigcap_{t \in T} \mathcal{B}_t = (Span_{t \in T} \mathcal{B}_t^\bot)^\bot$. However, the tuples $A_t$ may lack some of their elements.
-In \cite{svoboda04} a way to extend incomplete tuples $A_t$ to extended tuples $B_t$, that can take part in further processing was shown. A tuple $B_t$ can be created from $A_t$ by replacing all of the unknown elements with $0$ and adding some extra columns for the incomplete ones. For every column that doesn't have some projective depth, an extra column with zeros and known image projections should be added. If some column doesn't contain given point at all, a triple of columns with the standard basis spanning the dimensions of unknown point should be added. Equation \ref{eq:extendAt} illustrates it.
+A property of the rescaled measurement matrix that allows to recover its unknown
+elements is that in noise free conditions it has rank 4. That means its column
+space is four dimensional. If the basis $\mathcal{B}$ of that space is known,
+every other column can be expressed as linear combination of the vectors from
+that basis. The only condition is the column with missing elements are required
+to have at least four elements known (as the linear combination coefficients
+have to be computed first). In practice for elements means at least two image
+projections. First four element tuples $A_t$ of columns are sampled from the
+rescaled measurement matrix. It is not guaranteed that any of them spans the
+basis $\mathcal{B}$. However, the intersection of the subspaces spanned by them
+should span $\mathcal{B}$. That is given set $\mathcal{B}_t$ of linear subspaces
+generated by tuples of columns $A_t$, $\mathcal{B}$ can be computed as
+$\mathcal{B} = \bigcap_{t \in T} \mathcal{B}_t = (Span_{t \in T}
+\mathcal{B}_t^\bot)^\bot$.  However, the tuples $A_t$ may lack some of their
+elements. In \cite{svoboda04} a way to extend incomplete tuples $A_t$ to
+extended tuples $B_t$, that can take part in further processing was shown. A
+tuple $B_t$ can be created from $A_t$ by replacing all of the unknown elements
+with $0$ and adding some extra columns for the incomplete ones. For  every
+column that doesn't have some projective depth, an extra column with zeros and
+known  image projections should be added. If some column doesn't contain given
+point at all, a triple   of columns with the standard basis spanning the
+dimensions of unknown point should be added.   Equation \ref{eq:extendAt}
+illustrates it.
 
 \nmatheq {
     \label{eq:extendAt}
@@ -149,17 +241,55 @@ In \cite{svoboda04} a way to extend incomplete tuples $A_t$ to extended tuples $
     \end{bmatrix}
 }
 
-The generators $B_t^\bot$ of $\mathcal{B}_t^\bot$ can be computed by taking SVD of $B_t$: $[u, s, v] = svd(B_t)$. The generators are equal to $u[:, d:]$ (indexing operator $[]$ uses Python convention), where $d$ is dimension of $\mathcal{B}_t$, which is number of nonzero entries in $s$.
-To compute $(Span_{t \in T} \mathcal{B}_t^\bot)^\bot$, one needs to take $[u, s, v] = svd([B_1^\bot B_2^\bot \dots B_t^\bot])$ and $(Span_{t \in T} \mathcal{B}_t^\bot)^\bot$ is equal to $u[:, -4:]$.
-The detailed description how to recover the column space can be found in \cite{jacobs99} and \cite{svoboda04}. The function that computes the rank four column space in the associated program is called \code{rank\_four\_column\_space}. It takes the rescaled measurement matrix, and returns a new matrix with four columns that are basis for its column space.
+The generators $B_t^\bot$ of $\mathcal{B}_t^\bot$ can be computed by taking SVD
+of $B_t$: $[u, s, v] = svd(B_t)$. The generators are equal to $u[:, d:]$
+(indexing operator $[]$ uses Python convention), where $d$ is dimension of
+$\mathcal{B}_t$, which is number of nonzero entries in $s$. To compute $(Span_{t
+\in T} \mathcal{B}_t^\bot)^\bot$, one needs to take $[u, s, v] = svd([B_1^\bot
+B_2^\bot \dots B_t^\bot])$ and $(Span_{t \in T} \mathcal{B}_t^\bot)^\bot$ is
+equal to $u[:, -4:]$. The detailed description how to recover the column space
+can be found in \cite{jacobs99} and \cite{svoboda04}. The function that computes
+the rank four column space in the associated program is called
+\code{rank\_four\_column\_space}. It takes the rescaled measurement matrix, and
+returns a new matrix with four columns that are basis for its column space.
 
 \subsection{Iterative approach}
-To recover all missing image projections, the steps just described needs to be applied iteratively. At first the triple of rows that has the greatest number of elements filled is found, lets call it the fixed triple. Then all triples that have at least eight elements known in common with the fixed triple are gathered (the restriction imposed by the eight point algorithm). Then the sub-matrix from all of the collected triples is created and the projective depths for known projections are estimated. The next step is to compute the basis of column space and use it to fill the missing elements. The process is repeated until all the gaps are filled. The function responsible for the process is \code{reconstruct\_missing\_data}. It takes a measurement matrix \code{W} and returns its copy with gaps filled and the projective depths computed.
+
+To recover all missing image projections, the
+steps just described needs to be applied iteratively. At first the triple of
+rows that has the greatest number of elements filled is found, lets call it the
+fixed triple. Then all triples that have at least eight elements known in common
+with the fixed triple are gathered (the restriction imposed by the eight point
+algorithm). Then the sub-matrix from all of the collected triples is created and
+the projective depths for known projections are estimated. The next step is to
+compute the basis of column space and use it to fill the missing elements. The
+process is repeated until all the gaps are filled. The function responsible for
+the process is \code{reconstruct\_missing\_data}. It takes a measurement matrix
+\code{W} and returns its copy with gaps filled and the projective depths
+computed.
 
 \section{Factorization of Measurement Matrix}
-Having the projective depths recovered, rescaled measurement matrix $W$ can be factorized to set of camera matrices $\hat{P}$ and point positions $\hat{Q}$. The factorization can only by done up to some unknown projective transformation, but this issue will be fixed in the next step. As rescaled measurement matrix is rank 4 matrix, it can be factorized with SVD. However, before factorization it should be balanced to provide better stability of SVD (\cite{sturm96}). To balance the matrix, columns are rescaled, so that $\forall_{1 \leq i \leq n} \sum_{j=1}^m \left( (\lambda _i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2 \right) = 1$ and triples of rows are rescaled, so that $\forall_{1 \leq j \leq m} \sum_{i=0}^n \left( (\lambda _i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2 \right) = 1$. The balancing is done with \code{balance\_measurement\_matrix} function. In (\cite{sturm96}) it is suggested to repeat balancing until the measurement matrix changes, however in the implementation number of balancing steps is fixed to some constant.
 
-After balancing, the matrix can be factorized with SVD. Equation \ref{eq:rank4} illustrates it. As factorization of $s$ can be arbitrary, it is factorized by taking square root. The factorization is a part of the \code{factor\_measurement\_matrix} procedure.
+Having the projective depths
+recovered, rescaled measurement matrix $W$ can be factorized to set of camera
+matrices $\hat{P}$ and point positions $\hat{Q}$. The factorization can only by
+done up to some unknown projective transformation, but this issue will be fixed
+in the next step. As rescaled measurement matrix is rank 4 matrix, it can be
+factorized with SVD. However, before factorization it should be balanced to
+provide better stability of SVD (\cite{sturm96}). To balance the matrix, columns
+are rescaled, so that $\forall_{1 \leq i \leq n} \sum_{j=1}^m \left( (\lambda
+_i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2 \right) = 1$ and
+triples of rows are rescaled, so that $\forall_{1 \leq j \leq m} \sum_{i=0}^n
+\left( (\lambda _i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2
+\right) = 1$. The balancing is done with \code{balance\_measurement\_matrix}
+function. In (\cite{sturm96}) it is suggested to repeat balancing until the
+measurement matrix  changes, however in the implementation number of balancing
+steps is fixed to some constant.
+
+After balancing, the matrix can be factorized with SVD. Equation \ref{eq:rank4}
+illustrates it. As factorization of $s$ can be arbitrary, it is factorized by
+taking square root. The factorization is a part of the
+\code{factor\_measurement\_matrix} procedure.
 
 \nmatheq {
     \label{eq:rank4}
@@ -171,40 +301,82 @@ After balancing, the matrix can be factorized with SVD. Equation \ref{eq:rank4} 
 
 \section{Euclidean Stratification}
 
-The matrices $\hat{P}$ and $\hat{Q}$ are recovered up to some unknown projective transformation. An arbitrary projective transformation matrix $HH^{-1}$ can be inserted in-between $\hat{P}$ and $\hat{Q}$ and factorization still will be correct.
+The matrices $\hat{P}$ and $\hat{Q}$ are recovered up to some unknown projective
+transformation. An arbitrary projective transformation matrix $HH^{-1}$ can be inserted
+in-between $\hat{P}$ and $\hat{Q}$ and factorization still will be correct.
 
 \nmatheq{
     W = \hat{P}HH^{-1}\hat{Q} = PQ
 }
 
-To upgrade the projective factorization to the Euclidean one, the constraints on the rescaled measurement matrix $W$ and the camera matrix $P$ needs to be imposed. The first set of constraints puts the origin of the coordinate system to the centroid of yet unknown points. The second constraints uses properties of the camera matrices (an orthogonality of rotation matrix axes). The constraints give a raise to set of equations, which if solved gives a matrix that changes recovered structures to Euclidean ones. The details can be found in \cite{svoboda05} and \cite{han00}. At the end of the document, the equations \ref{eq:b}, \ref{eq:Q} and \ref{eq:vertical} for $b$ and $Q$ for single camera matrix are given for reference (the notation from \cite{svoboda05} is used). They can be extended to full system by stacking them together. The function \code{factor\_measurement\_matrix} solves the equations and returns stratified matrix.
+To upgrade the projective factorization to the Euclidean one, the constraints on
+the rescaled measurement matrix $W$ and the camera matrix $P$ needs to be
+imposed. The first set of constraints puts the origin of the coordinate system
+to the centroid of yet unknown points. The  second constraints uses properties
+of the camera matrices (an orthogonality of rotation matrix   axes). The
+constraints give a raise to set of equations, which if solved gives a matrix
+that   changes recovered structures to Euclidean ones. The details can be found
+in \cite{svoboda05}   and \cite{han00}. At the end of the document, the
+equations \ref{eq:b}, \ref{eq:Q} and   \ref{eq:vertical} for $b$ and $Q$ for
+single camera matrix are given for reference (the   notation from
+\cite{svoboda05} is used). They can be extended to full system by stacking them
+together. The function \code{factor\_measurement\_matrix} solves the equations
+and returns   stratified matrix.
 
 \newpage
 
 \section{Fixing Camera Matrices}
 
-As the triples of rows associated with given cameras can be multiplied by any nonzero scalar, there is ambiguity in recovered cameras. The z-axis of the camera may be reversed. To fix that a simple heuristic is used. The number of points visible in front of camera and in the back of it is counted and if the number of points visible at the rear side of camera is greater that at the front, the z-axis is reversed. \code{resolve\_camera\_ambiguity} function is intended for that purpose.
+As the triples of rows associated with given cameras can be multiplied by any
+nonzero scalar, there is ambiguity in recovered cameras. The z-axis of the
+camera may be reversed. To fix that a simple heuristic is used. The number of
+points visible in front of camera and in the back of it is counted and if the
+number of points visible at the rear side of camera is greater that at  the
+front, the z-axis is reversed. \code{resolve\_camera\_ambiguity} function is
+intended for  that purpose.
 
 \section{Alignment with World}
 
-To align recovered structures with the real world frame of reference the positions at least three point in real world that are not lying on the same line are needed. In the face of noise additional locations will improve the accuracy though. A system of linear equations can be created and solved with SVD to compute a matrix that transform the structures to the world coordinate system. In the implementation \code{find\_frame\_of\_reference} is the function which does that.
+To align recovered structures with the real world frame of reference the
+positions at least three point in real world that are not lying on the same line
+are needed. In the face of noise additional locations will improve the accuracy
+though. A system of linear equations can be created and solved with SVD to
+compute a matrix that transform the structures to the world coordinate system.
+In the implementation \code{find\_frame\_of\_reference} is the function which
+does that.
 
 \section{Dissecting the Camera Matrix}
 
-After successful factorization, to recover intrinsic and extrinsic camera parameters, the camera matrices needs to be factorized out. The function that does the job is called \code{decompose}, it takes a camera matrix and returns tuple $(K, R, T)$ with matrix of intrinsic parameters, rotation and translation vector. First the $P$ matrix is factorized with the RQ algorithm $\bar{K}, \bar{R} = rq(P[:3, :3])$. This factorization is slightly ambiguous and following steps are done to fix it (the fixed matrices will be called $\bar{K}'$ and $\bar{R}'$):
+After successful factorization, to recover intrinsic and extrinsic camera
+parameters, the camera matrices needs to be factorized out. The function that
+does the job is called \code{decompose}, it takes a camera matrix and returns
+tuple $(K, R, T)$ with matrix of intrinsic parameters, rotation and translation
+vector. First the $P$ matrix is factorized with the RQ algorithm $\bar{K},
+\bar{R} = rq(P[:3, :3])$. This factorization is slightly ambiguous and following
+steps are done to fix it (the fixed matrices will be called $\bar{K}'$ and
+$\bar{R}'$):
 
 \begin{enumerate}
-\item If $\bar{K}_{00}$ is negative multiply both the first column of $\bar{K}$ and first row of $\bar{R}$ by $-1$.
-\item If $\bar{K}_{11}$ is negative multiply both the second column of $\bar{K}$ and second row of $\bar{R}$ by $-1$.
-\item If $\bar{K}_{22}$ is positive (cameras from the implementation has reversed z-axis) multiply both the third column of $\bar{K}$ and third row of $\bar{R}$ by $-1$.
+\item If $\bar{K}_{00}$ is negative multiply both the first column of $\bar{K}$ and first row
+of $\bar{R}$ by $-1$.
+\item If $\bar{K}_{11}$ is negative multiply both the second column of $\bar{K}$ and second row
+of $\bar{R}$ by $-1$.
+\item If $\bar{K}_{22}$ is positive (cameras from the implementation has reversed z-axis)
+multiply both the third column of $\bar{K}$ and third row of $\bar{R}$ by $-1$.
 \item If determinant of $\bar{R}$ is negative multiply the whole matrix by $-1$.
 \end{enumerate}
 
-Then translation is computed as $T = (\bar{K}' \cdot (-\bar{R}'))^{-1} \cdot P[:3, 3]$. The last thing is to remove scaling from $\bar{K}$: $K = \dfrac{\bar{K}''}{\bar{K}'[2,2]}$.
+Then translation is computed as $T = (\bar{K}' \cdot (-\bar{R}'))^{-1} \cdot
+P[:3, 3]$. The  last thing is to remove scaling from $\bar{K}$: $K =
+\dfrac{\bar{K}''}{\bar{K}'[2,2]}$.
 
 \section{Experiments}
 
-Six experiments were conducted, on two test scenes, including one with real data. Image \ref{fig:artificial} presents the artificial scene. It consist of 10 cameras, the test points were randomly drawn from the sphere. Image \ref{fig:real} shows the arrangement of cameras on real scene. The points were generated by tracking bright diffuse LED.
+Six experiments were conducted, on two test scenes, including one with real
+data. Image  \ref{fig:artificial} presents the artificial scene. It consist of
+10 cameras, the test points  were randomly drawn from the sphere. Image
+\ref{fig:real} shows the arrangement of cameras on  real scene. The points were
+generated by tracking bright diffuse LED.
 
 \begin{figure}[ht]
 \centering
@@ -243,8 +415,16 @@ Following table summarizes conducted test.
 \end{tabular}
 \end{table}
 
-The algorithm turned out to be very sensitive to noise. In the case of the artificial scene an introduction of even very small error, just greater than the error of representation, caused the algorithm to not yield any reasonable output. Recovering the missing points was tested. The point were randomly removed from some cameras in artificial scene. The algorithm performs stably up to $40\%$ of removed points.
-Despite the high sensitivity to the noise in the artificial case, recovering cameras from real scene was quite successful. Following table presents real (with precision $0.1m$ precision) and recovered positions of cameras. In the case of real scene the implementation tolerates up to 10\% of missing points.
+The algorithm turned out to be very sensitive to noise. In the case of the
+artificial scene an  introduction of even very small error, just greater than
+the error of representation, caused  the algorithm to not yield any reasonable
+output. Recovering the missing points was tested. The  point were randomly
+removed from some cameras in artificial scene. The algorithm performs  stably up
+to $40\%$ of removed points. Despite the high sensitivity to the noise in the
+artificial case, recovering cameras from real  scene was quite successful.
+Following table presents real (with precision $0.1m$ precision) and  recovered
+positions of cameras. In the case of real scene the implementation tolerates up
+to  10\% of missing points.
 
 \begin{table}[ht]
 \centering
@@ -264,7 +444,16 @@ Despite the high sensitivity to the noise in the artificial case, recovering cam
 
 \section{Conclusions}
 
-Implemented algorithm turned out to be very sensitive to noise. It could have been expected, as some steps of original implementation was skipped \cite{svoboda05}. The major problem is a lack of any iterative refinement of intermediate results (e.g. optimizing projective structure with Bundle Adjustment, before factorization). The implementation has not means to handle outliers. Sampling the columns for estimation of the column space basis could be done way better. An order of computation of fundamental matrices is being chosen very naively (all fundamental matrices are always computed with respect to the first triple of rows in measurement matrix). There are plenty of places for improvement.
+Implemented algorithm turned out to be very sensitive to noise. It could have
+been expected, as  some steps of original implementation was skipped
+\cite{svoboda05}. The major problem is a   lack of any iterative refinement of
+intermediate results (e.g. optimizing projective structure   with Bundle
+Adjustment, before factorization). The implementation has not means to handle
+outliers. Sampling the columns for estimation of the column space basis could be
+done way    better. An order of computation of fundamental matrices is being
+chosen very naively (all    fundamental matrices are always computed with
+respect to the first triple of rows in    measurement matrix). There are plenty
+of places for improvement.
 
 \bibliographystyle{alpha}
 \bibliography{main}
