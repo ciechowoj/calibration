@@ -67,6 +67,17 @@ def plot_scene(points, cameras, size = 10, path = "scene.png"):
             print(T.ravel())
             print("", flush = True)
 
+        print("Camera positions:")
+        print("[")
+        for i, camera in enumerate(cameras):
+            K, R, T = plot_camera(axes3d, camera)
+
+            print("    [" + ", ".join(list(map(str, T.ravel()))) + "],")
+
+        print("]")
+
+        print("", flush = True)
+
     pyplot.savefig(path)
 
 def plot_view(points, camera, path = "view.png"):

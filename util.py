@@ -295,7 +295,7 @@ def print_matrix(M):
 
     print("-" * 80)
     for i in range(n):
-        print('|' + ' '.join(['{:8.2g} |'.format(M[i, j]) for j in range(m)]))
+        print('|' + ' '.join(['{:8.2f} |'.format(M[i, j]) for j in range(m)]))
     print("-" * 80)
 
 def recover_projective_depths(A, B):
@@ -326,7 +326,7 @@ def recover_all_projective_depths(W):
     for i in range(0, W.shape[0] // 3):
         W[i * 3 + 2] = 1
 
-    for i in range(0, W.shape[0] // 3):
+    for i in range(1, W.shape[0] // 3):
         if i != j:
             F = fundamental_matrix(W[i * 3:i * 3 + 3], W[j * 3:j * 3 + 3])
             e = left_epipole(F)

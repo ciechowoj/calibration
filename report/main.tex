@@ -9,6 +9,8 @@
 \usepackage{mathtools}
 \usepackage{lmodern}
 \usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
 
 \title{\textbf{Multi-Camera Self-Calibration}\\{\large Technical report}}
 \author{Wojciech Szęszoł\thanks{\textit{e-mail}:\texttt{ciechowoj@gmail.com}}}
@@ -25,14 +27,14 @@
 
 \section{Introduction}
 
-There are many applications for multi-camera systems in computing industry. Motion capture studios use multiple cameras for tracking special markers. Multiple
+There are many applications for multi-camera systems in the computer industry. Motion capture studios use multiple cameras for tracking special markers. Multiple
 cameras are used to track the position headsets in emerging VR technology. The systems of
-multiple cameras are becoming indispensable piece of modern technology.
+cameras are becoming indispensable piece of modern technology.
 
 The majority of such systems require some kind of calibration before being
 ready to provide target functionality. Calibration is the process of
 estimating position and orientation of cameras with respect to each other
-and to surrounding environments and sometimes the parameters of cameras itself.
+and to surrounding environment and sometimes the parameters of cameras itself.
 
 There are multiple ways to do the calibration. One way is to exploit the
 geometrical relationships between inputs from the cameras itself. This report
@@ -43,7 +45,7 @@ Multi-Camera  Self-Calibration for Virtual Environments" paper by Svoboda et al.
 The algorithm uses correspondence and position of points seen from different
 cameras of the system. The points are created by waving some bright object
 (like modified laser pointer or diffuse LED diode). The bright object will be
-called a pointer in the rest of the paper. A full version of the algorithm is
+called a pointer in the rest of this report. A full version of the algorithm is
 very robust, it is immune for measurement noise and significant amount of
 occlusions (the pointer doesn't have to be visible from all cameras at once).
 
@@ -57,17 +59,17 @@ environment.
 
 The 3D positions of the pointer across different time moments (on different frames
 from the camera  capture) forms a point cloud. The pixel locations of the points
-from the point cloud will be  called an image projections. Let $q_i^j$ be the
+from the point cloud will be  called image projections. Let $q_i^j$ be the
 image projection of i-th point from j-th  camera. The image projection has form
 $q_i^j = \begin{bmatrix} x_i^j & y_i^j & 1 \end{bmatrix}^T$, where $x_i^j$ and
-$y_i^j$ are  pixel coordinates in a system, which has an origin at the center of
-the image and which has x   and y axes pointing left and up respectively. We can
+$y_i^j$ are  pixel coordinates in the system, which has the origin at the center of
+the image and which has x and y axes pointing left and up respectively. We can
 arrange all such image projections in a   matrix $W$ called measurement matrix.
-Some of the fields in the measurement matrix may be   empty due to occlusions (a
-point can be invisible from given camera, occluded by some other   object or the
+Some of the fields in the measurement matrix may be empty due to occlusions (a
+point can be invisible from the given camera, occluded by some other object or the
 procedure that localized the bright spot on the image may fail and not report
-any location). Equation \ref{eq:w1} shows the measurement matrix with some
-elements missing   (marked as $\times$).
+any location). Equation~\ref{eq:w1} shows the measurement matrix with some
+elements missing (marked as $\times$).
 
 \nmatheq {
     \label{eq:w1}
@@ -86,9 +88,9 @@ elements missing   (marked as $\times$).
     \end{bmatrix}
 }
 
-Lets consider single point $Q_i$ and camera matrix $P^j$. Equation
-\ref{eq:projection} defines a rescaled image projection of point $Q_i$ for
-camera $P^j$.
+Lets consider a single point $Q_i$ and a camera matrix $P^j$. Equation
+\ref{eq:projection} defines a rescaled image projection of the point $Q_i$ for
+the camera $P^j$.
 
 \nmatheq {
     \label{eq:projection}
@@ -102,16 +104,15 @@ camera $P^j$.
 }
 
 The factors $\lambda_i^j$ are called projective depths. The image projections in
-the measurement matrix, that comes as the input of the algorithm have projective
+the measurement matrix, that comes as the input of the algorithm have the projective
 depths divided out. The measurement matrix $\hat{W}$ with known projective
 depths will be called a rescaled measurement matrix. The rescaled measurement
 matrix has rank four, if no noise is present. If the projective depths were
 known and there was no holes in the rescaled measurement matrix, it could be
-factorized into set of camera matrices $\hat{P}$ and set of point locations
+factorized into the set of camera matrices $\hat{P}$ and the set of point locations
 $\hat{Q}$.  However, the factorization would be only up to some projective
 transformation. An additional  Euclidean stratification step is needed to
-recover $P$ and $Q$ in Euclidean space. Equation  \ref{eq:w2} presents the
-factorization of the rescaled measurement matrix.
+recover $P$ and $Q$ in the Euclidean space. Equation ~\ref{eq:w2} presents factorization of the rescaled measurement matrix.
 
 \nmatheq {
     \label{eq:w2}
@@ -142,10 +143,9 @@ factorization of the rescaled measurement matrix.
 }
 
 If the real world locations of some (at least three which are not co-linear)
-points $Q_i$ are known, the recovered structures can be aligned with real world
+points $Q_i$ are known, recovered structures can be aligned with real world
 frame of reference (otherwise the scale, rotation and translation of recovered
-structures are completely arbitrary). The outline of the algorithm is (and
-the each step will be described in following sections):
+structures are completely arbitrary). The outline of the algorithm is (each step will be described in the subsequent sections):
 
 \begin{enumerate}
 \item Fill gaps in measurement matrix.
@@ -156,24 +156,24 @@ the each step will be described in following sections):
 \end{enumerate}
 
 The steps 1. and 2. have to be done together, as explained in the next section,
-they need to be repeated a few times to recover rescaled measurement matrix from
-partial measurement matrix.
+they need to be repeated several times to recover the rescaled measurement matrix from
+the partial measurement matrix.
 
-\section{Filling Gaps}
-\subsection{Recovering the projective depths}
+\section{Filling the gaps}
+\subsection{Recovering projective depths}
 
 Before trying to fill missing elements, the projective depths of known points
 need to be computed. Observe, that any column and any triple of rows associated
 with some camera matrix  $P_j$ of the rescaled measurement matrix can be
-multiplied with nonzero scalar without  changing the informations the rescaled
-measurement matrix contains (e.g. the camera parameters  or the point
+multiplied with nonzero scalar without changing the information the rescaled
+measurement matrix contains (e.g. the camera parameters or the point
 locations). The multiplication of a column is canceled by the fact that point
-locations are in homogeneous coordinated and $w$ component will accommodate the
-scaling.  Camera matrices can accommodate the scaling in similar manner. That
-means projective depths  can be fixed for single triple of rows and the rest of
-the depths can be calculated with  respect to that fixed row. To compute
-projective depths of some other row $k$ with respect to   fixed one $j$, a
-fundamental matrix $F^{jk}$ and a left epipole $e^{jk}$ need to be computed
+locations are in homogeneous coordinates and $w$ component accommodates the
+scaling. Camera matrices can accommodate the scaling in similar manner. That
+means projective depths can be fixed for single triple of rows and the rest of
+the depths can be calculated with respect to that fixed row. To compute
+projective depths of some other row $k$ with respect to the fixed one $j$, the
+fundamental matrix $F^{jk}$ and the left epipole $e^{jk}$ need to be computed
 \cite{sturm96}. It can be done with the eight point algorithm \cite{hartley95}
 (there are   also seven and five point variations \cite{stewenius06}, however
 my implementation uses only    the simplest, eight point one), then the
@@ -201,22 +201,22 @@ space is four dimensional. If the basis $\mathcal{B}$ of that space is known,
 every other column can be expressed as linear combination of the vectors from
 that basis. The only condition is the column with missing elements are required
 to have at least four elements known (as the linear combination coefficients
-have to be computed first). In practice for elements means at least two image
+have to be computed first). In practice, four elements means at least two image
 projections. First four element tuples $A_t$ of columns are sampled from the
 rescaled measurement matrix. It is not guaranteed that any of them spans the
 basis $\mathcal{B}$. However, the intersection of the subspaces spanned by them
 should span $\mathcal{B}$. That is given set $\mathcal{B}_t$ of linear subspaces
 generated by tuples of columns $A_t$, $\mathcal{B}$ can be computed as
-$\mathcal{B} = \bigcap_{t \in T} \mathcal{B}_t = (Span_{t \in T}
+$\mathcal{B} = \bigcap_{t \in T} \! \mathcal{B}_t = (Span_{t \in T}
 \mathcal{B}_t^\bot)^\bot$.  However, the tuples $A_t$ may lack some of their
 elements. In \cite{svoboda04} a way to extend incomplete tuples $A_t$ to
 extended tuples $B_t$, that can take part in further processing was shown. A
 tuple $B_t$ can be created from $A_t$ by replacing all of the unknown elements
 with $0$ and adding some extra columns for the incomplete ones. For  every
-column that doesn't have some projective depth, an extra column with zeros and
-known  image projections should be added. If some column doesn't contain given
+column that doesn't have a projective depth, the extra column with zeros and
+known  image projections should be added. If a column doesn't contain given
 point at all, a triple of columns with the standard basis spanning the
-dimensions of unknown point should be added. Equation \ref{eq:extendAt}
+dimensions of the unknown point should be added. Equation~\ref{eq:extendAt}
 illustrates it.
 
 \nmatheq {
@@ -242,7 +242,7 @@ illustrates it.
 
 The generators $B_t^\bot$ of $\mathcal{B}_t^\bot$ can be computed by taking SVD
 of $B_t$: $[u, s, v] = svd(B_t)$. The generators are equal to $u[:, d:]$
-(indexing operator $[]$ uses Python convention), where $d$ is dimension of
+(the indexing operator $[]$ uses the Python convention), where $d$ is dimension of
 $\mathcal{B}_t$, which is number of nonzero entries in $s$. To compute $(Span_{t
 \in T} \mathcal{B}_t^\bot)^\bot$, one needs to take $[u, s, v] = svd([B_1^\bot
 B_2^\bot \dots B_t^\bot])$ and $(Span_{t \in T} \mathcal{B}_t^\bot)^\bot$ is
@@ -254,7 +254,7 @@ returns a new matrix with four columns that are basis for its column space.
 
 \subsection{Iterative approach}
 
-To recover all missing image projections, the
+To recover all of the missing image projections, the
 steps just described needs to be applied iteratively. At first the triple of
 rows that has the greatest number of elements filled is found, lets call it the
 fixed triple. Then all triples that have at least eight elements known in common
@@ -277,15 +277,15 @@ in the next step. As rescaled measurement matrix is rank 4 matrix, it can be
 factorized with SVD. However, before factorization it should be balanced to
 provide better stability of SVD (\cite{sturm96}). To balance the matrix, columns
 are rescaled, so that $\forall_{1 \leq i \leq n} \sum_{j=1}^m \left( (\lambda
-_i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2 \right) = 1$ and
+_i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2 \right)~=~1$ and
 triples of rows are rescaled, so that $\forall_{1 \leq j \leq m} \sum_{i=0}^n
 \left( (\lambda _i^j x_i^j)^2 + (\lambda _i^j y_i^j)^2 + (\lambda _i^j)^2
-\right) = 1$. The balancing is done with \code{balance\_measurement\_matrix}
+\right) = 1$. The~balancing is done with \code{balance\_measurement\_matrix}
 function. In (\cite{sturm96}) it is suggested to repeat balancing until the
 measurement matrix  changes, however in my implementation number of balancing
 steps is fixed to some constant.
 
-After balancing, the matrix can be factorized with SVD. Equation \ref{eq:rank4}
+After balancing, the matrix can be factorized with SVD. Equation~\ref{eq:rank4}
 illustrates it. As factorization of $s$ can be arbitrary, it is factorized by
 taking square root. The factorization is a part of the
 \code{factor\_measurement\_matrix} procedure.
@@ -316,13 +316,11 @@ of the camera matrices (an orthogonality of rotation matrix   axes). The
 constraints give a raise to set of equations, which if solved gives a matrix
 that   changes recovered structures to Euclidean ones. The details can be found
 in \cite{svoboda05}   and \cite{han00}. At the end of the document, the
-equations \ref{eq:b}, \ref{eq:Q} and   \ref{eq:vertical} for $b$ and $Q$ for
+equations~\ref{eq:b},~\ref{eq:Q} and  ~\ref{eq:vertical} for $b$ and $Q$ for
 single camera matrix are given for reference (the   notation from
 \cite{svoboda05} is used). They can be extended to full system by stacking them
 together. The function \code{factor\_measurement\_matrix} solves the equations
 and returns   stratified matrix.
-
-\newpage
 
 \section{Fixing Camera Matrices}
 
@@ -337,23 +335,24 @@ intended for  that purpose.
 \section{Alignment with World}
 
 To align recovered structures with the real world frame of reference the
-positions at least three point in real world that are not lying on the same line
+positions of at least three point in real world that are not lying on the same line
 are needed. In the face of noise additional locations will improve the accuracy
 though. A system of linear equations can be created and solved with SVD to
-compute a matrix that transform the structures to the world coordinate system.
+compute a matrix that transforms the structures to the world coordinate system.
 In my implementation \code{find\_frame\_of\_reference} is the function which
 does that.
+
+\newpage
 
 \section{Dissecting the Camera Matrix}
 
 After successful factorization, to recover intrinsic and extrinsic camera
 parameters, the camera matrices needs to be factorized out. The function that
 does the job is called \code{decompose}, it takes a camera matrix and returns
-tuple $(K, R, T)$ with matrix of intrinsic parameters, rotation and translation
+tuple $(K, R, T)$ with the matrix of intrinsic parameters, the rotation and the translation
 vector. First the $P$ matrix is factorized with the RQ algorithm $\bar{K},
 \bar{R} = rq(P[:3, :3])$. This factorization is slightly ambiguous and following
-steps are carried out to fix it \textcolor{red}{CAN YOU EXPLAIN WHERE THESE STEPS COME FROM? FROM THE PAPER?} (the fixed matrices will be called $\bar{K}'$ and
-$\bar{R}'$):
+steps \cite{simek12} are carried out to fix it (the fixed matrices will be called $\bar{K}'$~and~$\bar{R}'$):
 
 \begin{enumerate}
 \item If $\bar{K}_{00}$ is negative multiply both the first column of $\bar{K}$ and first row
@@ -371,18 +370,79 @@ P[:3, 3]$. The  last thing is to remove scaling from $\bar{K}$: $K =
 
 \section{Experiments}
 
-Six experiments were conducted, on two test scenes, including one with real
-data. \textcolor{red}{[YOUR NOISE]} Figure \ref{fig:artificial} presents the artificial scene. It consist of 10 cameras, the test points  were randomly drawn from the sphere. Figure \ref{fig:real} shows the arrangement of cameras on  real scene. The points were
-generated by tracking bright diffuse LED.
+Several experiments were conducted, on two test scenes, including one with real
+data. Figure~\ref{fig:artificial} presents the artificial scene. It consist of
+10 cameras, the test points were randomly drawn from inside of the sphere. The
+points were transformed with the camera matrices, to obtain their pixels
+positions in the coordinate systems of the respective cameras. Then random noise was
+added to each of the pixel positions. Given a pixel position $p = (p_x, p_y)$, the
+new pixel position $p' = (p_x', p_y')$ with the noise added is $p_x' = p_x + (2
+\cdot \xi - 1) \cdot \varepsilon$, where $\xi$ is a standard uniform random
+variable ($\xi \in [0, 1)$), and $\varepsilon$ controls an amount of the noise added (the
+same~for~$y$).
 
-\textcolor{red}{YOU SHOULD AT LEAST INCLUDE A SENTENCE SAYING THAT THE IMPLEMENTATION WORKS WHEN THERE IS NO NOISE IN THE SYSTEM? WITH PERFECT SYNTHETIC DATA, THE RESUTLS ARE PERFECT?}
-
-\begin{figure}[ht]
+\begin{figure}[!ht]
 \centering
 \includegraphics[scale=0.5]{artificial.png}
 \caption{The arrangement of the cameras in artificial scene.}
 \label{fig:artificial}
 \end{figure}
+
+In a part of the tests, some of the pixel positions were erased to test if my
+implementation can handle the occlusions. The results are summarized in the
+table~\ref{tab:artificial}. The RMS error refers to the random mean square root
+error between the reference and recovered camera positions. To compute the error, the camera positions were interpreted as a flat array (see numpy's \code{ravel}). The "missing" column
+contains the fraction of the pixel positions erased.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c}{ \bfseries name} &
+\multicolumn{1}{|c}{ \bfseries cameras} &
+\multicolumn{1}{|c}{ \bfseries points} &
+\multicolumn{1}{|c}{ \bfseries missing} &
+\multicolumn{1}{|c}{ \bfseries noise ($\varepsilon$)} &
+\multicolumn{1}{|c|}{\bfseries RMS error } \\ \hline
+\code{testset\_m\_0\_0\_e\_0\_0}      & 10 & 100 & 0.0 & 0.0       & 0.00283 \\ \hline
+\code{testset\_m\_0\_1\_e\_0\_0}      & 10 & 100 & 0.1 & 0.0       & 0.00287 \\ \hline
+\code{testset\_m\_0\_2\_e\_0\_0}      & 10 & 100 & 0.2 & 0.0       & 0.00275 \\ \hline
+\code{testset\_m\_0\_4\_e\_0\_0}      & 10 & 100 & 0.4 & 0.0       & 0.01573 \\ \hline
+\code{testset\_m\_0\_8\_e\_0\_0}      & 10 & 100 & 0.8 & 0.0     & not converge \\ \hline
+\code{testset\_m\_0\_0\_e\_0\_1}      & 10 & 100 & 0.0 & $10^{-1}$ & 896.504 \\ \hline
+\code{testset\_m\_0\_0\_e\_0\_01}     & 10 & 100 & 0.0 & $10^{-2}$ & 15.8931 \\ \hline
+\code{testset\_m\_0\_0\_e\_0\_001}    & 10 & 100 & 0.0 & $10^{-3}$ & 19.7910 \\ \hline
+\code{testset\_m\_0\_0\_e\_0\_0001}   & 10 & 100 & 0.0 & $10^{-4}$ & 0.04995 \\ \hline
+\code{testset\_m\_0\_0\_e\_0\_00001}  & 10 & 100 & 0.0 & $10^{-5}$ & 0.00319 \\ \hline
+\code{testset\_m\_0\_1\_e\_0\_001}  & 10 & 100 & 0.1 & $10^{-3}$   & 549.828 \\ \hline
+\code{testset\_m\_0\_1\_e\_0\_0001}  & 10 & 100 & 0.1 & $10^{-4}$  & 9.78033 \\ \hline
+\end{tabular}
+\caption{A summary of the tests carried out with the artificial scene.}
+\label{tab:artificial}
+\end{table}
+
+% data/testset_m_0_0_e_0_0.csv :  0.00283474054273
+% data/testset_m_0_1_e_0_0.csv :  0.00287687828883
+% data/testset_m_0_2_e_0_0.csv :  0.002753317657
+% data/testset_m_0_4_e_0_0.csv :  0.0157395386403
+% data/testset_m_0_0_e_0_1.csv :  896.504346513
+% data/testset_m_0_0_e_0_01.csv :  15.8931605235
+% data/testset_m_0_0_e_0_001.csv :  19.7910311311
+% data/testset_m_0_0_e_0_0001.csv :  0.0499547559616
+% data/testset_m_0_0_e_0_00001.csv :  0.00319775979851
+% data/testset_m_0_1_e_0_001.csv :  549.828117517
+% data/testset_m_0_1_e_0_0001.csv :  9.78033946821
+
+The real data was captured with web and mobile phone cameras. The cameras used
+were Nokia Lumia 620 (1280x720), Nokia Lumia 820 (1280x720), Huawei P8 Lite
+(1088x1280), Motorola MB860 (1920x1080), Asus K56CB (640x480), Microsoft HD 3000
+(640x480), 4WORLD Z200 (640x480) (the values int the parentheses are resolutions).
+However, the capture from Motorola had to be discarded due to problems with
+synchronization (it was skipping and adding extra frames at random places) and
+the capture from Lumia 640 had to be discarded as well (due to lighting conditions). The points were generated by
+tracking a bright diffuse white LED. The moment of the LED switching on was used to
+synchronize the captures from all of the cameras. A checkerboard with known dimensions was used to capture the frame of reference of the scene. A special tool was written to
+extract the pixel positions of the pointer (the source code is in \texttt{sync.py}). Figure~\ref{fig:real} shows the arrangement of cameras on the real scene.
 
 \begin{figure}[ht]
 \centering
@@ -391,40 +451,8 @@ generated by tracking bright diffuse LED.
 \label{fig:real}
 \end{figure}
 
-\FloatBarrier
 
-Following table summarizes conducted test.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{|l|l|l|l|}
-\hline
-\multicolumn{1}{|c}{\bfseries Name} &
-\multicolumn{1}{|c}{\bfseries \# cameras} &
-\multicolumn{1}{|c}{\bfseries \# points} &
-\multicolumn{1}{|c|}{\bfseries \% missing } \\ \hline
-\code{testset\_0\_0} & 10 & 200 & 0 \\ \hline
-\code{testset\_1\_0} & 10 & 200 & 10 \\ \hline
-\code{testset\_2\_0} & 10 & 200 & 20 \\ \hline
-\code{testset\_4\_0} & 10 & 200 & 40 \\ \hline
-\code{dataset1}   & 5 & 132 & 0 \\ \hline
-\code{dataset2}   & 5 & 253 & 10 \\ \hline
-\code{dataset3}   & 5 & 263 & 14 \\ \hline
-\code{dataset4}   & 5 & 282 & 21 \\ \hline
-\end{tabular}
-\caption{\textcolor{red}{ADD A CAPTION HERE. YOU CAN ALSO ADD SOME ERROR MEASUREMENT IN PERCENTAGE FOR EXAMPLE}}
-\end{table}
-
-The algorithm turned out to be very sensitive to noise. In the case of the
-artificial scene an  introduction of even very small error, just greater than
-the error of representation, caused  the algorithm to not yield any reasonable
-output. Recovering the missing points was tested. The  point were randomly
-removed from some cameras in artificial scene. The algorithm performs  stably up
-to $40\%$ of removed points. Despite the high sensitivity to the noise in the
-artificial case, recovering cameras from real  scene was quite successful.
-Following table presents real (with precision $0.1m$ precision) and  recovered
-positions of cameras. In the case of real scene my implementation tolerates up
-to  10\% of missing points.
+Table~\ref{tab:positions} compares the real positions of the cameras (obtained with a tape measure, with $10cm$ accuracy) with the recovered ones. Table~\ref{tab:real} summarizes the experiment with real scene, a few tests with different degree of missing points were conducted. The "missing" column contains the number of missing pixel positions.
 
 \begin{table}[ht]
 \centering
@@ -439,24 +467,66 @@ to  10\% of missing points.
  4 & [16.0, 10.6, 12.4] & [18.2, 9.2,  13.0] \\ \hline
  5 & [-6.3, 10.6, -13.8] & [-2.9, 9.0, -12.2] \\ \hline
 \end{tabular}
+\caption{The real and recovered camera positions.}
+\label{tab:positions}
 \end{table}
 
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\multicolumn{1}{|c}{ \bfseries name} &
+\multicolumn{1}{|c}{ \bfseries cameras} &
+\multicolumn{1}{|c}{ \bfseries points} &
+\multicolumn{1}{|c}{ \bfseries missing} &
+\multicolumn{1}{|c|}{\bfseries RMS error } \\ \hline
+\code{dataset1}      & 5  & 132 & 0  & 2.92276 \\ \hline
+\code{dataset2}      & 5  & 253 & 10 & 3.44128 \\ \hline
+\code{dataset3}      & 5  & 263 & 14 & 5.55154 \\ \hline
+\code{dataset4}      & 5  & 282 & 21 & 3.40607 \\ \hline
+\end{tabular}
+\caption{A summary of the tests carried out with the real scene.}
+\label{tab:real}
+\end{table}
+
+% data/dataset1.csv :  2.92276712426
+% data/dataset2.csv :  3.44128694798
+% data/dataset3.csv :  5.55154646563
+% data/dataset4.csv :  3.40607167903
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.4]{sync.png}
+\caption{A screen-shot from the \texttt{sync.py} tool, which was used to synchronize the videos and capture the positions of the pointer (the view from discarded cameras is included).}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.097]{stick.jpg}
+\caption{A photo of the "stick" that was used as the pointer.}
+\end{figure}
 
 \section{Conclusions}
 
-Implemented algorithm turned out to be very sensitive to noise. It could have
-been expected, as  some steps of original implementation was skipped
-\cite{svoboda05}. The major problem is a   lack of any iterative refinement of
-intermediate results (e.g. optimizing projective structure   with Bundle
-Adjustment, before factorization). My implementation has not means to handle
-outliers. Sampling the columns for estimation of the column space basis could be
-done way better \textcolor{red}{PLEASE SOME MORE FORMAL LANGUAGE}. An order of computation of fundamental matrices is being
-chosen very naively (all    fundamental matrices are always computed with
-respect to the first triple of rows in    measurement matrix). There are plenty
-of places for improvement.
+Implemented algorithm turned out to be quite sensitive to noise. It gives almost
+exact results for precise data, but the robustness of the implemented algorithm
+quickly diminishes as the error increases. It could have been expected, as some
+steps of original implementation \cite{svoboda05} were skipped. The major
+problem is the lack of any iterative refinement of the intermediate results (e.g.
+optimizing projective structure with Bundle Adjustment, before factorization).
+My implementation has not means to handle outliers (the points in real world
+experiments were manually selected). The methods applied to sample the columns for
+the estimation of the column space basis and to choose the order of computation
+of fundamental matrices are very naive in comparison to the ones presented in
+the paper. However, as it was experimentally proven, it is robust enough to
+recover an approximate structure and motion from the real-world data.
+
+\FloatBarrier
 
 \bibliographystyle{alpha}
 \bibliography{main}
+
+The associated code can be found under the following link \url{https://github.com/ciechowoj/calibration} .
 
 \newpage
 

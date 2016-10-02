@@ -1,5 +1,6 @@
 from numpy import *
 from numpy.linalg import *
+from numpy.random import *
 from util import *
 
 def sample_cube(num, center = array([0, 0, 0]), size = 1):
@@ -860,13 +861,16 @@ def print_matrix(M):
 
     print("-" * 80)
     for i in range(n):
-        print('|' + ' '.join(['{:8.2g} |'.format(M[i, j]) for j in range(m)]))
+        print('|' + ' '.join(['{:8.2f} |'.format(M[i, j]) for j in range(m)]))
     print("-" * 80)
 
 def create_dataset(path, W, X, R, percent, error):
     file = open(path, "w+")
-
+    W = W.copy()
     W = remove_point_locations(W, percent)
+
+    for i in range(W.shape[0] // 3):
+        W[i * 3: i * 3 + 2] += uniform(-1.0, 1.0, (2, W.shape[1])) * error
 
     file.write("#resolutions\n")
     file.write(str(R[0][0]) + ";" + " " + str(R[0][1]))
@@ -885,12 +889,9 @@ def create_dataset(path, W, X, R, percent, error):
         file.write(str(i) + "; ")
         file.write("{:.2f}".format(i / 30))
 
-        x = (random() * 2.0 - 1.0) * error
-        y = (random() * 2.0 - 1.0) * error
-
         for j in range(W.shape[0] // 3):
-            file.write("; " + "{:.7f}".format(W[j * 3 + 0, i] + x))
-            file.write("; " + "{:.7f}".format(W[j * 3 + 1, i] + y))
+            file.write("; " + "{:.7f}".format(W[j * 3 + 0, i]))
+            file.write("; " + "{:.7f}".format(W[j * 3 + 1, i]))
 
         file.write("\n")
 
@@ -904,7 +905,7 @@ def create_dataset(path, W, X, R, percent, error):
 def create_datasets():
     X = make_test_points2()[:, :100]
 
-    cameras = camera_test_set1()[0:10]
+    cameras = camera_test_set1()[:]
     resolutions = [camera[1] for camera in cameras]
 
     def camera_matrix(cameras):
@@ -914,7 +915,16 @@ def create_datasets():
     W = dot(P, X)
     W = remove_projective_depths(W)
 
-    create_dataset("data/testset_0_0.csv", W,  X[:, :25], resolutions, 0.0, 0)
-    create_dataset("data/testset_1_0.csv", W,  X[:, :25], resolutions, 0.1, 0)
-    create_dataset("data/testset_2_0.csv", W,  X[:, :25], resolutions, 0.2, 0)
-    create_dataset("data/testset_4_0.csv", W,  X[:, :25], resolutions, 0.4, 0)
+    create_dataset("data/testset_m_0_0_e_0_0.csv",     W,  X[:, :25], resolutions, 0.0, 0)
+    create_dataset("data/testset_m_0_1_e_0_0.csv",     W,  X[:, :25], resolutions, 0.1, 0)
+    create_dataset("data/testset_m_0_2_e_0_0.csv",     W,  X[:, :25], resolutions, 0.2, 0)
+    create_dataset("data/testset_m_0_4_e_0_0.csv",     W,  X[:, :25], resolutions, 0.4, 0)
+    create_dataset("data/testset_m_0_8_e_0_0.csv",     W,  X[:, :25], resolutions, 0.8, 0)
+    create_dataset("data/testset_m_0_0_e_0_1.csv",     W,  X[:, :25], resolutions, 0.0, 0.1)
+    create_dataset("data/testset_m_0_0_e_0_01.csv",    W,  X[:, :25], resolutions, 0.0, 0.01)
+    create_dataset("data/testset_m_0_0_e_0_001.csv",   W,  X[:, :25], resolutions, 0.0, 0.001)
+    create_dataset("data/testset_m_0_0_e_0_0001.csv",  W,  X[:, :25], resolutions, 0.0, 0.0001)
+    create_dataset("data/testset_m_0_0_e_0_00001.csv", W,  X[:, :25], resolutions, 0.0, 0.00001)
+    create_dataset("data/testset_m_0_1_e_0_001.csv",   W,  X[:, :25], resolutions, 0.1, 0.001)
+    create_dataset("data/testset_m_0_1_e_0_0001.csv",   W,  X[:, :25], resolutions, 0.1, 0.001)
+

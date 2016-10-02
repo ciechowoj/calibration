@@ -66,7 +66,7 @@ hP, hX = resolve_camera_ambiguity(W, hP, hX)
 
 hCameras = separate_cameras(hP, resolutions)
 
-plot_scene(hX[:, :-89], hCameras)
+plot_scene(hX[:, :], hCameras)
 
 if len(sys.argv) > 3:
     plot_view(hX[:, :-140], hCameras[int(sys.argv[3])])
