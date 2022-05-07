@@ -1,5 +1,5 @@
-# calibration
-Multi-Camera Self-Calibration
+# Documentation
+[technical report](doc/Multi-Camera Self-Calibration technical report.pdf)
 
 # Input file format.
 Comments start with #.
